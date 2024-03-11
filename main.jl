@@ -1,65 +1,51 @@
 import Pkg
+Pkg.add("JLD2")
 Pkg.add("Images")
-Pkg.add("FileIO")
+Pkg.add("Statistics")
 
+using JLD2
 using Images
-using FileIO
 using Statistics
 
-# Define the path to the dataset folder
-dataset_folder = "dataset/train/"
+# Functions that allow the conversion from images to Float64 arrays
+function imageToColorArray(image::Array{RGB{Normed{UInt8,8}},2})
+  matrix = Array{Float64,3}(undef, size(image, 1), size(image, 2), 3)
+  matrix[:, :, 1] = convert(Array{Float64,2}, red.(image))
+  matrix[:, :, 2] = convert(Array{Float64,2}, green.(image))
+  matrix[:, :, 3] = convert(Array{Float64,2}, blue.(image))
+  return matrix
+end;
+imageToColorArray(image::Array{RGBA{Normed{UInt8,8}},2}) = imageToColorArray(RGB.(image));
 
-# Get a list of all subfolders in the dataset folder
-subfolders = readdir(dataset_folder)
+
+# Functions to load the dataset
+
+VLow = "dataset/train/Very_Low/"
+VHigh = "dataset/train/Very_High/"
 
 
 
-# Loop through each subfolder
-for subfolder in subfolders
-    # Check if the subfolder is "Very_Low" or "Very_High"
-    if subfolder == "Very_Low" || subfolder == "Very_High"
-        # Get the path to the current subfolder
-        subfolder_path = joinpath(dataset_folder, subfolder)
+image = imageToColorArray(load("dataset/train/Very_High/27340611_5_-110.15605261856_43.68153326218.png"))
 
-        # Get a list of all image files in the subfolder
-        image_files = filter(file ->
-                isfile(joinpath(subfolder_path, file)), readdir(subfolder_path))
-
-        # Loop through each image file
-        for image_file in image_files
-            # Get the path to the current image file
-            image_path = joinpath(subfolder_path, image_file)
-
-            # Load the image into memory
-            image = load(image_path)
-
-            # Append the image to the corresponding array
-            if subfolder == "Very_Low"
-                push!(very_low_images, image)
-            elseif subfolder == "Very_High"
-                push!(very_high_images, image)
-            end
-        end
-    end
+function meanRGB(image::Array{Float64,3})
+  (mean(image[:, :, 1]), mean(image[:, :, 2]), mean(image[:, :, 3]))
 end
 
-# Now the images are divided into the `very_low_images` and `very_high_images` arrays
+function stdRGB(image::Array{Float64,3})
+  (std(image[:, :, 1]), std(image[:, :, 2]), std(image[:, :, 3]))
 
+end
 
-# Calcular la media y la desviación estándar de
-very_low_red_mean = [mean(red(image)) for image in very_low_images]
-very_low_green_mean = [mean(green(image)) for image in very_low_images]
-very_low_blue_mean = [mean(blue(image)) for image in very_low_images]
+function imageLoader(folder::String, type::Integer)
+	imagArr = []
+  for fileName in readdir(folder)
+    imag = imageToColorArray(load(string(folder, fileName)))
+		push!(imagArr, [meanRGB(imag) stdRGB(imag) type])
+  end
+	return imagArr
+end
 
-very_low_red_std = [std(red(image)) for image in very_low_images]
-very_low_green_std = [std(green(image)) for image in very_low_images]
-very_low_blue_std = [std(blue(image)) for image in very_low_images]
+VH = imageLoader("dataset/train/Very_High/", 1)
+VL = imageLoader("dataset/train/Very_Low/", 0)
 
-# Calcular la media y la desviación estándar de los canales de color para very_high_images
-very_high_red_mean = [mean(red(image)) for image in very_high_images]
-very_high_green_mean = [mean(green(image)) for image in very_high_images]
-very_high_blue_mean = [mean(blue(image)) for image in very_high_images]
-
-very_high_red_std = [std(red(image)) for image in very_high_images]
-very_high_green_std = [std(green(image)) for image in very_high_images]
-very_high_blue_std = [std(blue(image)) for image in very_high_images]
+vcat(VH, VL)
