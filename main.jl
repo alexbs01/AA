@@ -32,10 +32,10 @@ function stdRGB(image::Array{Float64,3})
 end
 
 function imageLoader(folder::String, type::Integer)
-	imagArr = Array{Any}(undef, 0, 7)
+  imagArr = []
   for fileName in readdir(folder)
     imag = imageToColorArray(load(string(folder, fileName)))
-    imagArr = vcat(imagArr, hcat(meanRGB(imag), stdRGB(imag), type))
+    push!(imagArr, hcat(meanRGB(imag), stdRGB(imag), type))
   end
   return imagArr
 end
@@ -46,5 +46,3 @@ VL = imageLoader("dataset/train/Very_Low/", false)
 V = vcat(VH, VL)
 
 save_object("VH-VL.jld2", V)
-
-V
