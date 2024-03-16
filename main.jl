@@ -23,29 +23,28 @@ imageToColorArray(image::Array{RGBA{Normed{UInt8,8}},2}) = imageToColorArray(RGB
 VLow = "dataset/train/Very_Low/"
 VHigh = "dataset/train/Very_High/"
 
-
-
-image = imageToColorArray(load("dataset/train/Very_High/27340611_5_-110.15605261856_43.68153326218.png"))
-
 function meanRGB(image::Array{Float64,3})
-  (mean(image[:, :, 1]), mean(image[:, :, 2]), mean(image[:, :, 3]))
+  [mean(image[:, :, 1]) mean(image[:, :, 2]) mean(image[:, :, 3])]
 end
 
 function stdRGB(image::Array{Float64,3})
-  (std(image[:, :, 1]), std(image[:, :, 2]), std(image[:, :, 3]))
-
+  [std(image[:, :, 1]) std(image[:, :, 2]) std(image[:, :, 3])]
 end
 
 function imageLoader(folder::String, type::Integer)
-	imagArr = []
+	imagArr = Array{Any}(undef, 0, 7)
   for fileName in readdir(folder)
     imag = imageToColorArray(load(string(folder, fileName)))
-		push!(imagArr, [meanRGB(imag) stdRGB(imag) type])
+    imagArr = vcat(imagArr, hcat(meanRGB(imag), stdRGB(imag), type))
   end
-	return imagArr
+  return imagArr
 end
 
-VH = imageLoader("dataset/train/Very_High/", 1)
-VL = imageLoader("dataset/train/Very_Low/", 0)
+VH = imageLoader("dataset/train/Very_High/", true)
+VL = imageLoader("dataset/train/Very_Low/", false)
 
-vcat(VH, VL)
+V = vcat(VH, VL)
+
+save_object("VH-VL.jld2", V)
+
+V
