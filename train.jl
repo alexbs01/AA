@@ -285,6 +285,9 @@ ann = trainClassANN(topology,
   (normalizeMinMax(inputVl, Normalization), targtVl'),
   (normalizeMinMax(inputTs, Normalization), targtTs'))
 
+
+save_object("annAndLoss.jld2", ann)
+
 output = ann[1](normalizeMinMax(inputTs, Normalization)')
 println(accuracy(output', targtTs'))
 
