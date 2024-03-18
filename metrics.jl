@@ -49,3 +49,7 @@ ann = load_object("annAndLoss.jld2")
 data = load_object("VH-VL.jld2")
 
 
+outputs = ann[1](data[3]')
+
+
+printConfusionMatrix(vec(outputs'), vec(data[6]'))

@@ -191,7 +191,10 @@ function trainClassANN(topology::AbstractArray{<:Int,1},
   maxEpochsVal::Int=20)
 
   ann = buildClassANN(size(trainingDataset[1], 2), topology, size(trainingDataset[2], 2), transferFunctions)
-  loss(model, x, y) = (size(y, 1) == 1) ? Losses.binarycrossentropy(model(x), y) : Losses.crossentropy(model(x), y)
+  
+	ann(trainingDataset[1]')
+
+	loss(model, x, y) = (size(y, 1) == 1) ? Losses.binarycrossentropy(model(x), y) : Losses.crossentropy(model(x), y)
   opt_state = Flux.setup(Adam(learningRate), ann)
 
   lossTrain = loss(ann, trainingDataset[1]', trainingDataset[2]')
@@ -256,37 +259,12 @@ end
 
 data = load_object("VH-VL.jld2")
 
-
-index = holdOut(size(data, 1), 0.2, 0.2)
-
-
-Normalization = calculateMinMaxNormalizationParameters(Float32.(data[:, 1:6]))
-
-inputTr = data[index[1], 1:6]
-inputVl = data[index[2], 1:6]
-inputTs = data[index[3], 1:6]
-inputTr = Float32.(inputTr)
-inputVl = Float32.(inputVl)
-inputTs = Float32.(inputTs)
-
-targtTr = data[index[1], 7]
-targtVl = data[index[2], 7]
-targtTs = data[index[3], 7]
-targtTr = oneHotEncoding(targtTr)
-targtVl = oneHotEncoding(targtVl)
-targtTs = oneHotEncoding(targtTs)
-
 topology = [7, 5, 4]
 
-
-ann = trainClassANN(topology,
-  (normalizeMinMax(inputTr, Normalization), targtTr'),
-  (normalizeMinMax(inputVl, Normalization), targtVl'),
-  (normalizeMinMax(inputTs, Normalization), targtTs'))
-
+ann = trainClassANN(
+  topology,
+  (data[1], data[4]'),
+  (data[2], data[5]'),
+  (data[3], data[6]'))
 
 save_object("annAndLoss.jld2", ann)
-
-output = ann[1](normalizeMinMax(inputTs, Normalization)')
-println(accuracy(output', targtTs'))
-

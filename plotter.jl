@@ -1,4 +1,3 @@
-
 using JLD2
 using Plots
 
@@ -8,7 +7,6 @@ ann = load_object("annAndLoss.jld2")
 
 #plot
 len = length(ann[2])
-println(len)
 p = plot()
 plot!(p, 1:len, ann[2], label="Tr")
 plot!(p, 1:len, ann[3], label="Vl")
