@@ -6,7 +6,6 @@ using Statistics
 using Random
 using Flux
 using Flux.Losses
-using Plots
 
 # oneHotEncoding
 function oneHotEncoding(feature::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
@@ -291,11 +290,3 @@ save_object("annAndLoss.jld2", ann)
 output = ann[1](normalizeMinMax(inputTs, Normalization)')
 println(accuracy(output', targtTs'))
 
-#plot
-len = length(ann[2])
-println(len)
-p = plot()
-plot!(p, 1:len, ann[2], label="Tr")
-plot!(p, 1:len, ann[3], label="Vl")
-plot!(p, 1:len, ann[4], label="Ts")
-display(p)
