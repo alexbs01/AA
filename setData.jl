@@ -159,11 +159,10 @@ targtTr = oneHotEncoding(targtTr)
 targtVl = oneHotEncoding(targtVl)
 targtTs = oneHotEncoding(targtTs)
 
-
-save_object("VH-VL.jld2", (
-  normalizeMinMax(inputTr, Normalization),
-  normalizeMinMax(inputVl, Normalization),
-  normalizeMinMax(inputTs, Normalization),
-  targtTr,
-  targtVl,
-  targtTs))
+save("VH-VL.jld2",
+  "inTr", normalizeMinMax(inputTr, Normalization),
+  "inVl", normalizeMinMax(inputVl, Normalization),
+  "inTs", normalizeMinMax(inputTs, Normalization),
+  "trTr", targtTr,
+  "trVl", targtVl,
+  "trTs", targtTs)

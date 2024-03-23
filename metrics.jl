@@ -1,4 +1,7 @@
 using JLD2
+using Random
+using Flux
+using Flux.Losses
 
 function confusionMatrix(outputs::AbstractArray{Bool,1}, targets::AbstractArray{Bool,1})
   VP = count((outputs .+ targets) .== 2)
@@ -45,11 +48,10 @@ function printConfusionMatrix(outputs::AbstractArray{<:Real,1},
   printConfusionMatrix(broadcast(>=, outputs, threshold), targets)
 end
 
-ann = load_object("annAndLoss.jld2")
-data = load_object("VH-VL.jld2")
+ann = load("annAndLoss.jld2", "ann")
+inTs = load("VH-VL.jld2", "inTs")
+trTs = load("VH-VL.jld2", "trTs")
 
+outputs = ann(inTs')
 
-outputs = ann[1](data[3]')
-
-
-printConfusionMatrix(vec(outputs'), vec(data[6]'))
+printConfusionMatrix(vec(outputs'), vec(trTs'))

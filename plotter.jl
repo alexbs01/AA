@@ -3,12 +3,14 @@ using Plots
 
 # load ann 
 
-ann = load_object("annAndLoss.jld2")
+lTr = load("annAndLoss.jld2", "lossTr")
+lVl = load("annAndLoss.jld2", "lossVl")
+lTs = load("annAndLoss.jld2", "lossTs")
 
 #plot
-len = length(ann[2])
+len = length(lTr)
 p = plot()
-plot!(p, 1:len, ann[2], label="Tr")
-plot!(p, 1:len, ann[3], label="Vl")
-plot!(p, 1:len, ann[4], label="Ts")
+plot!(p, 1:len, lTr, label="Tr")
+plot!(p, 1:len, lVl, label="Vl")
+plot!(p, 1:len, lTs, label="Ts")
 display(p)

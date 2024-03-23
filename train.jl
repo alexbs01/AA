@@ -191,10 +191,10 @@ function trainClassANN(topology::AbstractArray{<:Int,1},
   maxEpochsVal::Int=20)
 
   ann = buildClassANN(size(trainingDataset[1], 2), topology, size(trainingDataset[2], 2), transferFunctions)
-  
-	ann(trainingDataset[1]')
 
-	loss(model, x, y) = (size(y, 1) == 1) ? Losses.binarycrossentropy(model(x), y) : Losses.crossentropy(model(x), y)
+  ann(trainingDataset[1]')
+
+  loss(model, x, y) = (size(y, 1) == 1) ? Losses.binarycrossentropy(model(x), y) : Losses.crossentropy(model(x), y)
   opt_state = Flux.setup(Adam(learningRate), ann)
 
   lossTrain = loss(ann, trainingDataset[1]', trainingDataset[2]')
@@ -257,14 +257,19 @@ function trainClassANN(topology::AbstractArray{<:Int,1},
 end
 
 
-data = load_object("VH-VL.jld2")
+inTr = load("VH-VL.jld2", "inTr")
+inVl = load("VH-VL.jld2", "inVl")
+inTs = load("VH-VL.jld2", "inTs")
+trTr = load("VH-VL.jld2", "trTr")
+trVl = load("VH-VL.jld2", "trVl")
+trTs = load("VH-VL.jld2", "trTs")
 
-topology = [7, 5, 4]
+topology = [5, 3]
 
 ann = trainClassANN(
   topology,
-  (data[1], data[4]'),
-  (data[2], data[5]'),
-  (data[3], data[6]'))
+  (inTr, trTr'),
+  (inVl, trVl'),
+  (inTs, trTs'))
 
-save_object("annAndLoss.jld2", ann)
+save("annAndLoss.jld2", "ann", ann[1], "lossTr", ann[2], "lossVl", ann[3], "lossTs", ann[4])
