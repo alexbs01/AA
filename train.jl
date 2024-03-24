@@ -264,7 +264,7 @@ trTr = load("VH-VL.jld2", "trTr")
 trVl = load("VH-VL.jld2", "trVl")
 trTs = load("VH-VL.jld2", "trTs")
 
-topology = [5, 3]
+topology = [3, 2]
 
 ann = trainClassANN(
   topology,
@@ -272,4 +272,6 @@ ann = trainClassANN(
   (inVl, trVl'),
   (inTs, trTs'))
 
-save("annAndLoss.jld2", "ann", ann[1], "lossTr", ann[2], "lossVl", ann[3], "lossTs", ann[4])
+save("annAndLoss.jld2", "topology", topology, "ann", ann[1], "lossTr", ann[2], "lossVl", ann[3], "lossTs", ann[4])
+
+include("metrics.jl")

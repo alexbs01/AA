@@ -51,7 +51,9 @@ end
 ann = load("annAndLoss.jld2", "ann")
 inTs = load("VH-VL.jld2", "inTs")
 trTs = load("VH-VL.jld2", "trTs")
+topology = load("annAndLoss.jld2", "topology")
 
 outputs = ann(inTs')
 
+println(topology)
 printConfusionMatrix(vec(outputs'), vec(trTs'))
