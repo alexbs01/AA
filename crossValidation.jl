@@ -104,10 +104,32 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
      
     targets = oneHotEncoding(targets);
 
-    for fold = i:numExecutions
-        
-    end
+    for fold = i:numFolds
+        iterIndexes = findall(crossValidationIndices .== fold)
+        if(validationRatio == 0)
+            trainInputs = inputs[iterIndexes]
+            trainOutputs = targets[iterIndexes]
+        else
+            #holdOut para separar entrenamiento y validación
+        end
+        #testInputs = 
+        #testOutputs = 
+        #como nosotros los tenemos separados no sé cómo pasárselos
 
+        precisionesFold = zeros(1, numClassifiers);
+        tasasErrorFold = zeros(1, numClassifiers);
+        sensibilidadesFold = zeros(1, numClassifiers);
+        especificidadesFold = zeros(1, numClassifiers);
+        VPPsFold = zeros(1, numClassifiers);
+        VPNsFold = zeros(1, numClassifiers);
+        F1sFold = zeros(1, numClassifiers);
+
+        for exec = i:numExecutions
+            #llamar a trainClassAnn y evaluarla con confusionMatrix
+        end
+        #hacer la media de los resultados obtenidos en confusionMatrix
+    end
+ 
 end
 
 #PRUEBAS
