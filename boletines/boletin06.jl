@@ -4,6 +4,8 @@ include("boletin03.jl");
 include("boletin04.jl");
 using ScikitLearn
 using ScikitLearn: fit!, predict
+using Flux
+using Flux.Losses
 using .Metrics: confusionMatrix
 using .ANNUtils: oneHotEncoding, trainClassANN
 using .Overtraining: holdOut
@@ -120,7 +122,7 @@ export modelCrossValidation, set_modelHyperparameters
 "validationRatio" => 0.2, "numExecutions" => 50, "maxEpochs" => 1000,
 "maxEpochsVal" => 6);
 
-    function set_modelHyperparameters(modelType::Symbol; kernel::String, C::Float64=0.0, 
+    function set_modelHyperparameters(modelType::Symbol; kernel::String="linear", C::Float64=0.0, 
                                         degree::Int64=0, gamma::Float64=0.0, 
                                         coef0::Float64=0.0, topology::Array{Int64,1}=[2,3],
                                         learningRate::Float64=0.01, validationRatio::Float64=0.2,
@@ -132,7 +134,7 @@ export modelCrossValidation, set_modelHyperparameters
                 (modelType == :KNeighborsClassifier) 
                 "Model must be ANN, SVC, DecissionTreeClassifier or KNeighborsClassifier"
 
-        dict = Dict{String, Any}("kernel" => kernel)
+        dict = Dict{String, Any}("modelType" => modelType, "kernel" => kernel)
 
         if modelType == :ANN
             if topology != [2,3]

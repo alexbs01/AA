@@ -1,4 +1,11 @@
-using DelimitedFiles
+using Pkg;
+Pkg.add("DelimitedFiles");
+Pkg.add("Flux");
+Pkg.add("Statistics");
+
+using DelimitedFiles;
+using Flux;
+using Flux.Losses;
 
 include("boletin02.jl");
 include("boletin03.jl");
@@ -276,7 +283,7 @@ end
 
 # EJERCICIO 06
 function test_set_modelHyperparameters()
-    parameters1 = set_modelHyperparameters("linear", C=1.0)
+    parameters1 = set_modelHyperparameters(:SVC, kernel="linear", C=1.0)
 
     println(parameters1)
 end
