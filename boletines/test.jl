@@ -1,18 +1,16 @@
 using DelimitedFiles
 
 include("boletin02.jl");
+include("boletin03.jl");
+include("boletin04.jl");
+include("boletin06.jl");
 import .ANNUtils: oneHotEncoding, calculateMinMaxNormalizationParameters, 
                 calculateZeroMeanNormalizationParameters, normalizeMinMax,
                 normalizeMinMax!, normalizeZeroMean, normalizeZeroMean!, 
                 classifyOutputs, accuracy, buildClassANN, trainClassANN;
-
-include("boletin03.jl");
+                
 import .Overtraining: holdOut;
-
-include("boletin04.jl");
 import .Metrics: confusionMatrix, printConfusionMatrix;
-
-include("boletin06.jl");
 import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 dataset = readdlm("boletines/iris/iris.data", ',');
