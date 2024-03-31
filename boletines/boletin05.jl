@@ -1,36 +1,16 @@
+module CrossValidation
+
 using Random;
 using Flux;
 
-# FUNCIONES DE PRÁCTICAS ANTERIORES
+export crossvalidation, ANNCrossValidation
 
-function oneHotEncoding(feature::AbstractArray{<:Any, 1}, classes::AbstractArray{:Any, 1})
-    numClasses = length(classes);
-
-    @assert (numClasses>1) "Para un problema de clasificación debe haber más de una clase";
-    if(numClasses==2)
-        targets = reshape(targets.==classes[1], :, 1);
-    
-    else
-        targets = BitArray{2}(undef, length(features), numClasses); #La longitud de features es el número de patrones que hay
-        for numClass = 1::numClasses
-            targets[:,numClass] .= (features.==classes[numClass]);
-        end
-    end
-    return targets;
-end
-
-function oneHotEncoding(feature::AbstractArray{<:Any, 1})
-    classes = unique(feature);
-    return oneHotEncoding(feature, classes);
-end
+include("boletin02.jl")
+include("boletin03.jl")
+import .ANNUtils: oneHotEncoding, trainClassANN
+import .Overtraining: holdOut
 
 
-function oneHotEncoding(feature::AbstractArray{Bool,1})
-    return reshape(feature, :, 1);
-end
-
-
-#FUNCIONES NUEVAS
 
 function crossvalidation(N::Int64, k::Int)
     auxVector = 1:k;
@@ -76,6 +56,8 @@ end
 
 function crossvalidation(targets::AbstractArray{<:Any,1}, k::Int)
     classes = unique(targets);
+
+    @assert (length(classes) > 1) "Es necesario un mínimo de dos clases"
 
     if(length(classes) == 2)
         return crossvalidation(targets==classes[1], k);
