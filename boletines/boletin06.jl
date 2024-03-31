@@ -90,7 +90,7 @@ export modelCrossValidation, set_modelHyperparameters
             precisionPerTraining = zeros(numExecutions)
             negativePredictiveValuesPerTraining = zeros(numExecutions)
             f1PerTraining = zeros(numExecutions)
-            confusionMatrixPerTraining = zeros(size(targets, 2), size(targets, 2), numExecutions)
+            confusionMatrixPerTraining = zeros(size(oneHotEncoding(targets), 2), size(oneHotEncoding(targets), 2), numExecutions)
 
             for numExecution in 1:numExecutions
 
