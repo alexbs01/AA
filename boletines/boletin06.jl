@@ -6,6 +6,7 @@ using ScikitLearn
 using ScikitLearn: fit!, predict
 using Flux
 using Flux.Losses
+using Flux.fordward
 using .Metrics: confusionMatrix
 using .ANNUtils: oneHotEncoding, trainClassANN
 using .Overtraining: holdOut
@@ -38,6 +39,15 @@ export modelCrossValidation, set_modelHyperparameters
             testingInputs = inputs[crossValidationIndices .== 1, :]
             testingTargets = targets[crossValidationIndices .== 1, :]
 
+            accuracyPerTraining = zeros(numExecutions)
+            errorRatePerTraining = zeros(numExecutions)
+            sensibilityPerTraining = zeros(numExecutions)
+            specificityPerTraining = zeros(numExecutions)
+            precisionPerTraining = zeros(numExecutions)
+            negativePredictiveValuesPerTraining = zeros(numExecutions)
+            f1PerTraining = zeros(numExecutions)
+            confusionMatrixPerTraining = zeros(2, 2, numExecutions)
+
             for numExecution in 1:numExecutions
                 if validationRatio > 0.0
                     train, val, test = holdOut(size(inputs, 1), validationRatio, testRatio)
@@ -52,10 +62,21 @@ export modelCrossValidation, set_modelHyperparameters
                         learningRate=learningRate, maxEpochs=maxEpochs, 
                         maxEpochVal=maxEpochsVal, transferFunctions=transferFunctions)
                 end
+
+                (accuracyPerTraining[numExecution], errorRatePerTraining[numExecution], 
+                    sensibilityPerTraining[numExecution], specificityPerTraining[numExecution], 
+                    precisionPerTraining[numExecution], negativePredictiveValuesPerTraining[numExecution], 
+                    f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(collect(bestAnn(testingInputs)), testingTargets)
             end
 
-            
-            
+            acc = mean(accuracyPerTraining)
+            errorRate = mean(errorRatePerTraining)
+            sensibility = mean(sensibilityPerTraining)
+            specificity = mean(specificityPerTraining)
+            precision = mean(precisionPerTraining)
+            negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
+            f1 = mean(f1PerTraining)
+            matrix = mean(confusionMatrixPerTraining, dims=3)
 
         else
             if modelType == :SVC
@@ -70,10 +91,6 @@ export modelCrossValidation, set_modelHyperparameters
                 if kernel == "linear"
                     @assert C.hasKey("C") "In linear kernel, C must be defined"
 
-                    if degree.hasKey("degree") || gamma.hasKey["gamma"] || coef0.hasKey["coef0"] 
-                        println("In linear kernel, degree, gamma and coef0 will be ignored")
-                    end
-
                     model = SVC(kernel=kernel, C=C)
                 
                 elseif kernel == "poly"
@@ -84,18 +101,10 @@ export modelCrossValidation, set_modelHyperparameters
                 elseif kernel == "rbf"
                     @assert gamma.hasKey["gamma"] && C.hasKey["C"] "In rbf kernel, gamma and C must be defined"
 
-                    if degree.hasKey("degree") || coef0.hasKey("coef0")
-                        println("In rbf kernel, degree and coef0 will be ignored")
-                    end
-
                     model = SVC(kernel=kernel, C=C, gamma=gamma)
                 
                 elseif kernel == "sigmoid"
                     @assert gamma.hasKey["gamma"] && coef0.hasKey["coef0"] && C.hasKey["C"] "In sigmoid kernel, gamma, coef0 and C must be defined"
-                    
-                    if degree.hasKey["degree"]
-                        println("In sigmoid kernel, degree will be ignored")
-                    end
 
                     model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
                     
@@ -105,7 +114,7 @@ export modelCrossValidation, set_modelHyperparameters
                 max_depth = modelHyperparameters["max_depth"]
 
                 @assert max_depth.hasKey("max_depth") "In DecisionTreeClassifier, max_depth must be defined"
-                model = DecisionTreeClassifier(max_depth=max_depth)
+                model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
 
             elseif modelType == :KNeighborsClassifier
                 n_neighbors = modelHyperparameters["n_neighbors"]
