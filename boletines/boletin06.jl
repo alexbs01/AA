@@ -104,23 +104,15 @@ export modelCrossValidation, set_modelHyperparameters
                     @assert kernel in possibleKernel "Kernel must be linear, poly, rbf or sigmoid"
 
                     if kernel == "linear"
-                        #@assert modelCrossValidation.hasKey("C") "In linear kernel, C must be defined"
-
                         model = SVC(kernel=kernel, C=C)
                     
                     elseif kernel == "poly"
-                        @assert degree.hasKey("degree") && gamma.hasKey["gamma"] && coef0.hasKey["coef0"] && C.hasKey["C"] "In linear kernel, degree, gamma, coef0 and C must be defined"
-
                         model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0)
                     
                     elseif kernel == "rbf"
-                        @assert gamma.hasKey["gamma"] && C.hasKey["C"] "In rbf kernel, gamma and C must be defined"
-
                         model = SVC(kernel=kernel, C=C, gamma=gamma)
                     
                     elseif kernel == "sigmoid"
-                        @assert gamma.hasKey["gamma"] && coef0.hasKey["coef0"] && C.hasKey["C"] "In sigmoid kernel, gamma, coef0 and C must be defined"
-
                         model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
                         
                     end
@@ -128,13 +120,10 @@ export modelCrossValidation, set_modelHyperparameters
                 elseif modelType == :DecissionTreeClassifier
                     max_depth = modelHyperparameters["max_depth"]
 
-                    @assert max_depth.hasKey("max_depth") "In DecisionTreeClassifier, max_depth must be defined"
                     model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
 
                 elseif modelType == :KNeighborsClassifier
                     n_neighbors = modelHyperparameters["n_neighbors"]
-
-                    @assert n_neighbors.hasKey("n_neighbors") "In KNeighborsClassifier, n_neighbors must be defined"
 
                     model = KNeighborsClassifier(n_neighbors=n_neighbors)
                 end

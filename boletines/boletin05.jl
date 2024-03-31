@@ -127,8 +127,8 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
             transferFunctions, maxEpochs, minLoss, learningRate, maxEpochsVal)
             outputs = bestAnn(testInputs)
 
-            (precisionesFold[exec], tasasErrorFold[exec], sensibilidadesFold[exec], especificidadesFold[exec], VPPsFold[exec]
-            VPNsFold[exec], F1sFold[exec],)confusionMatrix(outputs, targets)
+            (precisionesFold[exec], tasasErrorFold[exec], sensibilidadesFold[exec], especificidadesFold[exec], VPPsFold[exec],
+            VPNsFold[exec], F1sFold[exec], _) = confusionMatrix(outputs, targets)
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
         precisiones[fold] = mean(precisionesFold)
