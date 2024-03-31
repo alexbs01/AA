@@ -117,7 +117,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
 
         for exec in 1:numExecutions
             #llamar a trainClassAnn y evaluarla con confusionMatrix
-            trainClassANN(topology, (trainInputs, trainOutputs), (validationInputs, validationOutputs), (testInputs, testOutputs), 
+            (bestAnn, trainingLosses, validationLosses, testLosses) = trainClassANN(topology, (trainInputs, trainOutputs), (validationInputs, validationOutputs), (testInputs, testOutputs), 
             transferFunctions, maxEpochs, minLoss, learningRate, maxEpochsVal)
 
         end
