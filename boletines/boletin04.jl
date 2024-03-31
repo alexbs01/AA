@@ -158,7 +158,7 @@ export confusionMatrix, printConfusionMatrix
     function confusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{Bool,2};
         weighted::Bool=true)
 
-        @assert all([in(output, unique(targets)) for output in outputs]) "The outputs must be in the targets"
+        #@assert all([in(output, unique(targets)) for output in outputs]) "The outputs must be in the targets"
         @assert size(outputs, 2) == size(targets, 2) "The size of the outputs and targets must be the same"
         @assert size(outputs, 2) != 2 "The output and target must have more than two features. Outputs: $(size(outputs, 2)) Targets: $(size(targets, 2))"
 

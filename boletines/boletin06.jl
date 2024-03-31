@@ -1,4 +1,7 @@
 module ScikitModels
+using Pkg
+"""Pkg.add("Statistics")"""
+
 include("boletin02.jl");
 include("boletin03.jl");
 include("boletin04.jl");
@@ -6,6 +9,7 @@ using ScikitLearn
 using ScikitLearn: fit!, predict
 using Flux
 using Flux.Losses
+using Statistics
 using .Metrics: confusionMatrix
 using .ANNUtils: oneHotEncoding, trainClassANN
 using .Overtraining: holdOut
@@ -33,6 +37,7 @@ export modelCrossValidation, set_modelHyperparameters
             learningRate = modelHyperparameters["learningRate"]
             transferFunctions = modelHyperparameters["transferFunctions"]
             validationRatio = modelHyperparameters["validationRatio"]
+            testRatio = modelHyperparameters["testRatio"]
             numExecutions = modelHyperparameters["numExecutions"]
             
             targets = oneHotEncoding(targets)
@@ -48,27 +53,30 @@ export modelCrossValidation, set_modelHyperparameters
             precisionPerTraining = zeros(numExecutions)
             negativePredictiveValuesPerTraining = zeros(numExecutions)
             f1PerTraining = zeros(numExecutions)
-            confusionMatrixPerTraining = zeros(2, 2, numExecutions)
+            confusionMatrixPerTraining = zeros(size(targets, 2), size(targets, 2), numExecutions)
 
             for numExecution in 1:numExecutions
                 if validationRatio > 0.0
                     train, val, test = holdOut(size(inputs, 1), validationRatio, testRatio)
 
                     (bestAnn, _, _, _) = trainClassANN(topology, (inputs[train, :], targets[train, :]), 
-                        validationDataset=(inputs[val, :], targets[val, :]), testDataset(inputs[test, :], targets[test, :]), 
+                        validationDataset=(inputs[val, :], targets[val, :]), testDataset=(inputs[test, :], targets[test, :]), 
                         learningRate=learningRate, maxEpochs=maxEpochs, 
-                        maxEpochVal=maxEpochsVal, transferFunctions=transferFunctions)
+                        maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions)
                 else
                     (bestAnn, _, _, _) = trainClassANN(topology, (trainingInputs, trainingTargets), 
                         testDataset=(testingInputs, testingTargets), 
                         learningRate=learningRate, maxEpochs=maxEpochs, 
-                        maxEpochVal=maxEpochsVal, transferFunctions=transferFunctions)
+                        maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions)
                 end
+                
+                println(collect(bestAnn(testingInputs')'))
+                println(testingTargets)
 
                 (accuracyPerTraining[numExecution], errorRatePerTraining[numExecution], 
                     sensibilityPerTraining[numExecution], specificityPerTraining[numExecution], 
                     precisionPerTraining[numExecution], negativePredictiveValuesPerTraining[numExecution], 
-                    f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(collect(bestAnn(testingInputs)), testingTargets)
+                    f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(collect(bestAnn(testingInputs')'), testingTargets)
             end
 
         else
@@ -148,6 +156,7 @@ export modelCrossValidation, set_modelHyperparameters
         end
 
         acc = mean(accuracyPerTraining)
+        println(accuracyPerTraining)
         errorRate = mean(errorRatePerTraining)
         sensibility = mean(sensibilityPerTraining)
         specificity = mean(specificityPerTraining)

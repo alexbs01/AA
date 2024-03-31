@@ -1,5 +1,5 @@
 using Pkg;
-Pkg.add("Random");
+"""Pkg.add("Random");"""
 
 
 module Overtraining

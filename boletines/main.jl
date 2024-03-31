@@ -1,9 +1,10 @@
 using Pkg
-Pkg.add("DelimitedFiles")
+"""Pkg.add("DelimitedFiles")
 Pkg.add("Flux")
 Pkg.add("Statistics")
 Pkg.add("Random")
-Pkg.add("ScikitLearn")
+Pkg.add("ScikitLearn")"""
+
 
 using DelimitedFiles
 using Flux
