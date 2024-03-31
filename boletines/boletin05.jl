@@ -41,8 +41,8 @@ export crossvalidation, ANNCrossValidation
 
 
     function crossvalidation(targets::AbstractArray{Bool,2}, k::Int)
-        indexes = zeros(Int64, 1, size(targets, 1))
-        println(typeof(indexes))
+        indexes = zeros(Int64, size(targets, 1))
+
         for numClass = 1:size(targets, 2)
             class = targets[:, numClass];
             numElems = sum(class);
@@ -55,7 +55,6 @@ export crossvalidation, ANNCrossValidation
             indexes[instances] .= groups;
         end
 
-        
         return indexes;
     end
 
@@ -153,5 +152,5 @@ bools = [
 ]
 
 sol = crossvalidation(bools, 4);
-
+println(typeof(sol))
 print(sol);
