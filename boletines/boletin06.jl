@@ -136,10 +136,13 @@ export modelCrossValidation, set_modelHyperparameters
                     model = KNeighborsClassifier(n_neighbors=n_neighbors)
                 end
 
-                trainingInputs = inputs[crossValidationIndices .!= 1, :]
-                trainingTargets = targets[crossValidationIndices .!= 1]
-                testingInputs = inputs[crossValidationIndices .== 1, :]
-                testingTargets = targets[crossValidationIndices .== 1]
+                trainIndex = findall(crossValidationIndices .!= 1)
+                testIndex = findall(crossValidationIndices .== 1)
+
+                trainingInputs = inputs[trainIndex, :]
+                trainingTargets = targets[trainIndex]
+                testingInputs = inputs[testIndex, :]
+                testingTargets = targets[testIndex]
     
                 model = fit!(model, trainingInputs, trainingTargets);
     

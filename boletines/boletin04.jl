@@ -92,50 +92,33 @@ export confusionMatrix, printConfusionMatrix
         end
         
     end
+        
 
 # Boletin04_1
 # Main functions
     function confusionMatrix(outputs::AbstractArray{Bool,1}, targets::AbstractArray{Bool,1})
-        """
-                        Prediction
-                        | Negative | Positive
-        Real| Negative  |   TN          FP
-            | Positive  |   FN          TP
-        """
-        @assert length(outputs) == length(targets) "The length of the outputs and targets must be the same"
-        matrix = zeros(Int64, 2, 2)
-
-        num_trues = outputs .== targets
-        num_falses = outputs .!= targets
-
-        matrix[1,1] = sum(outputs[num_trues] .== false)  # True negatives
-        matrix[1,2] = sum(outputs[num_falses] .== true)  # False positives
-        matrix[2,1] = sum(outputs[num_falses] .== false) # False negatives
-        matrix[2,2] = sum(outputs[num_trues] .== true)   # True positives
-
-        println("B")
-        println(matrix)
-
-        accuracy = _accuracy(matrix)
-        errorRate = _errorRate(matrix)
-        sensitivity = _sensitivity(matrix)
-        specificity = _specificity(matrix)
-        precision = _precision(matrix)
-        negativePredictiveValue = _negativePredictiveValue(matrix)
-        f1Score = _f1Score(matrix)
-
-        println("\n\n")
-
-        return (accuracy, errorRate, sensitivity, specificity, precision, negativePredictiveValue, f1Score, matrix)
+        VP = count((outputs .+ targets) .== 2)
+        VN = count((outputs .+ targets) .== 0)
+        FP = count(((outputs .== false) .+ targets) .== 0)
+        FN = count(((outputs .== false) .+ targets) .== 2)
+        conf = [VN FP; FN VP]
+    
+        pre = (VN + VP) / (VN + VP + FN + FP)
+        err = (FN + FP) / (VN + VP + FN + FP)
+        sen = VP / (FN + VP)
+        esp = VN / (FP + VN)
+        vpp = VP / (VP + FP)
+        vpn = VN / (FP + VN)
+        f1 = 2 * ((sen * pre) / (sen + pre))
+    
+        return (pre, err, sen, esp, vpp, vpn, f1, conf)
     end
 
 
-    function confusionMatrix(outputs::AbstractArray{<:Real,1}, targets::AbstractArray{Bool,1};
-                            threshold::Real=0.5)
-
-        outputs = (outputs .> threshold)
-
-        return confusionMatrix(outputs, targets)
+    function confusionMatrix(outputs::AbstractArray{<:Real,1},
+        targets::AbstractArray{Bool,1}; threshold::Real=0.5)
+    
+        return confusionMatrix(broadcast(>=, outputs, threshold), targets)
     end
 
     function printConfusionMatrix(outputs::AbstractArray{Bool,1}, targets::AbstractArray{Bool,1})
