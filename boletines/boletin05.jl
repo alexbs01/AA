@@ -77,22 +77,22 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),maxEpochs::Int=1000, minLoss::Real=0.0,
     learningRate::Real=0.01,validationRatio::Real=0, maxEpochsVal::Int=20)
 
-     numFolds = maximum(crossValidationIndices);
-     
-     numClassifiers = length(unique(targets));
+    numFolds = maximum(crossValidationIndices);
+    
+    numClassifiers = length(unique(targets));
 
-     if numClassifiers == 2
+    if numClassifiers == 2
         numClassifiers = 1
-     end
-     
-     precisiones = zeros(2, numClassifiers, numFolds);
-     tasasError = zeros(2, numClassifiers, numFolds);
-     sensibilidades = zeros(2, numClassifiers, numFolds);
-     especificidades = zeros(2, numClassifiers, numFolds);
-     VPPs = zeros(2, numClassifiers, numFolds);
-     VPNs = zeros(2, numClassifiers, numFolds);
-     F1s = zeros(2, numClassifiers, numFolds);
-     
+    end
+    
+    precisiones = zeros(2, numClassifiers, numFolds);
+    tasasError = zeros(2, numClassifiers, numFolds);
+    sensibilidades = zeros(2, numClassifiers, numFolds);
+    especificidades = zeros(2, numClassifiers, numFolds);
+    VPPs = zeros(2, numClassifiers, numFolds);
+    VPNs = zeros(2, numClassifiers, numFolds);
+    F1s = zeros(2, numClassifiers, numFolds);
+    
     targets = oneHotEncoding(targets);
 
     for fold in 1:numFolds
