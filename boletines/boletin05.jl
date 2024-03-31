@@ -12,6 +12,7 @@ import .Metrics: confusionMatrix
 
 using Random;
 using Flux;
+using Statistics
 
 
 function crossvalidation(N::Int64, k::Int)
@@ -81,14 +82,18 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
      numFolds = maximum(crossValidationIndices);
      
      numClassifiers = length(unique(targets));
+
+     if numClassifiers == 2
+        numClassifiers = 1
+     end
      
-     precisiones = zeros(1, numClassifiers);
-     tasasError = zeros(1, numClassifiers);
-     sensibilidades = zeros(1, numClassifiers);
-     especificidades = zeros(1, numClassifiers);
-     VPPs = zeros(1, numClassifiers);
-     VPNs = zeros(1, numClassifiers);
-     F1s = zeros(1, numClassifiers);
+     precisiones = zeros(2, numClassifiers, numFolds);
+     tasasError = zeros(2, numClassifiers, numFolds);
+     sensibilidades = zeros(2, numClassifiers, numFolds);
+     especificidades = zeros(2, numClassifiers, numFolds);
+     VPPs = zeros(2, numClassifiers, numFolds);
+     VPNs = zeros(2, numClassifiers, numFolds);
+     F1s = zeros(2, numClassifiers, numFolds);
      
     targets = oneHotEncoding(targets);
 
@@ -97,33 +102,47 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         trainIndexes = findall(crossValidationIndices .!= fold) #El resto será el conjunto de entrenamiento
         
         trainInputs = inputs[trainIndexes]
-        trainOutputs = targets[trainIndexes]
+        trainTargets = targets[trainIndexes]
         testInputs = inputs[testIndexes]
-        testOutputs =  targets[testIndexes]
+        testTargets =  targets[testIndexes]
 
         if(validationRatio != 0)
             trainSize = length(trainInputs);
             validationRatio = validationRatio * trainSize/(length(crossValidationIndices))
             trainIndexes, valIndexes = holdOut(trainSize, validationRatio)
+
+            trainTargets = trainTargets[trainIndexes]
+            validationTargets = validationTargets[trainIndexes]
         end
 
-        precisionesFold = zeros(1, numClassifiers);
-        tasasErrorFold = zeros(1, numClassifiers);
-        sensibilidadesFold = zeros(1, numClassifiers);
-        especificidadesFold = zeros(1, numClassifiers);
-        VPPsFold = zeros(1, numClassifiers);
-        VPNsFold = zeros(1, numClassifiers);
-        F1sFold = zeros(1, numClassifiers);
+        precisionesFold = zeros(2, numClassifiers, numExecutions);
+        tasasErrorFold = zeros(2, numClassifiers, numExecutions);
+        sensibilidadesFold = zeros(2, numClassifiers, numExecutions);
+        especificidadesFold = zeros(2, numClassifiers, numExecutions);
+        VPPsFold = zeros(2, numClassifiers, numExecutions, numExecutions);
+        VPNsFold = zeros(2, numClassifiers, numExecutions, numExecutions);
+        F1sFold = zeros(2, numClassifiers, numExecutions, numExecutions);
 
         for exec in 1:numExecutions
             #llamar a trainClassAnn y evaluarla con confusionMatrix
             (bestAnn, trainingLosses, validationLosses, testLosses) = trainClassANN(topology, (trainInputs, trainOutputs), (validationInputs, validationOutputs), (testInputs, testOutputs), 
             transferFunctions, maxEpochs, minLoss, learningRate, maxEpochsVal)
+            outputs = bestAnn(testInputs)
 
+            (precisionesFold[exec], tasasErrorFold[exec], sensibilidadesFold[exec], especificidadesFold[exec], VPPsFold[exec]
+            VPNsFold[exec], F1sFold[exec],)confusionMatrix(outputs, targets)
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
+        precisiones[fold] = mean(precisionesFold)
+        tasasError[fold] = mean(tasasErrorFold)
+        sensibilidades[fold] = mean(sensibilidadesFold)
+        especificidades[fold] = mean(especificidadesFold)
+        VPPs[fold] = mean(VPPsFold)
+        VPNs[fold] = mean(VPNsFold)
+        F1s[fold] = mean(F1sFold)
     end
-
+    return (mean(precisiones, std(precisiones))), (mean(tasasError, std(tasasError))), (mean(sensibilidades), std(sensibilidades)),
+     (mean(especificidades), std(especificidades)), (mean(VPPs), std(VPPs)), (mean(VPNs), std(VPNs)), (mean(F1s), std(F1s))
     end
  
 end
