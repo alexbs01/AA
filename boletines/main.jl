@@ -28,7 +28,7 @@ test06 = ["set_modelHyperparameters"]
         
 tests = ["trainClassANN"]
 
-for test in test06
+for test in tests
     test_function = Symbol("test_", test) # Convert string to symbol (a function name)
     if @isdefined test_function # Check if the function exists
         eval(test_function)() # Call the function

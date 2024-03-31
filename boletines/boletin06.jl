@@ -6,7 +6,6 @@ using ScikitLearn
 using ScikitLearn: fit!, predict
 using Flux
 using Flux.Losses
-using Flux.fordward
 using .Metrics: confusionMatrix
 using .ANNUtils: oneHotEncoding, trainClassANN
 using .Overtraining: holdOut
@@ -69,73 +68,90 @@ export modelCrossValidation, set_modelHyperparameters
                     f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(collect(bestAnn(testingInputs)), testingTargets)
             end
 
-            acc = mean(accuracyPerTraining)
-            errorRate = mean(errorRatePerTraining)
-            sensibility = mean(sensibilityPerTraining)
-            specificity = mean(specificityPerTraining)
-            precision = mean(precisionPerTraining)
-            negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
-            f1 = mean(f1PerTraining)
-            matrix = mean(confusionMatrixPerTraining, dims=3)
-
         else
-            if modelType == :SVC
-                possibleKernel = ["linear", "poly", "rbf", "sigmoid"]
-                C = modelHyperparameters["C"]
-                kernel = modelHyperparameters["kernel"]
-                degree = modelHyperparameters["degree"]
-                gamma = modelHyperparameters["gamma"]
-                coef0 = modelHyperparameters["coef0"]
-                @assert kernel in possibleKernel "Kernel must be linear, poly, rbf or sigmoid"
+            numExecutions = modelHyperparameters["numExecutions"]
 
-                if kernel == "linear"
-                    @assert C.hasKey("C") "In linear kernel, C must be defined"
+            accuracyPerTraining = zeros(numExecutions)
+            errorRatePerTraining = zeros(numExecutions)
+            sensibilityPerTraining = zeros(numExecutions)
+            specificityPerTraining = zeros(numExecutions)
+            precisionPerTraining = zeros(numExecutions)
+            negativePredictiveValuesPerTraining = zeros(numExecutions)
+            f1PerTraining = zeros(numExecutions)
+            confusionMatrixPerTraining = zeros(2, 2, numExecutions)
 
-                    model = SVC(kernel=kernel, C=C)
-                
-                elseif kernel == "poly"
-                    @assert degree.hasKey("degree") && gamma.hasKey["gamma"] && coef0.hasKey["coef0"] && C.hasKey["C"] "In linear kernel, degree, gamma, coef0 and C must be defined"
+            for numExecution in 1:numExecutions
 
-                    model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0)
-                
-                elseif kernel == "rbf"
-                    @assert gamma.hasKey["gamma"] && C.hasKey["C"] "In rbf kernel, gamma and C must be defined"
+                if modelType == :SVC
+                    possibleKernel = ["linear", "poly", "rbf", "sigmoid"]
+                    C = modelHyperparameters["C"]
+                    kernel = modelHyperparameters["kernel"]
+                    degree = modelHyperparameters["degree"]
+                    gamma = modelHyperparameters["gamma"]
+                    coef0 = modelHyperparameters["coef0"]
+                    @assert kernel in possibleKernel "Kernel must be linear, poly, rbf or sigmoid"
 
-                    model = SVC(kernel=kernel, C=C, gamma=gamma)
-                
-                elseif kernel == "sigmoid"
-                    @assert gamma.hasKey["gamma"] && coef0.hasKey["coef0"] && C.hasKey["C"] "In sigmoid kernel, gamma, coef0 and C must be defined"
+                    if kernel == "linear"
+                        @assert C.hasKey("C") "In linear kernel, C must be defined"
 
-                    model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
+                        model = SVC(kernel=kernel, C=C)
                     
+                    elseif kernel == "poly"
+                        @assert degree.hasKey("degree") && gamma.hasKey["gamma"] && coef0.hasKey["coef0"] && C.hasKey["C"] "In linear kernel, degree, gamma, coef0 and C must be defined"
+
+                        model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0)
+                    
+                    elseif kernel == "rbf"
+                        @assert gamma.hasKey["gamma"] && C.hasKey["C"] "In rbf kernel, gamma and C must be defined"
+
+                        model = SVC(kernel=kernel, C=C, gamma=gamma)
+                    
+                    elseif kernel == "sigmoid"
+                        @assert gamma.hasKey["gamma"] && coef0.hasKey["coef0"] && C.hasKey["C"] "In sigmoid kernel, gamma, coef0 and C must be defined"
+
+                        model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
+                        
+                    end
+
+                elseif modelType == :DecissionTreeClassifier
+                    max_depth = modelHyperparameters["max_depth"]
+
+                    @assert max_depth.hasKey("max_depth") "In DecisionTreeClassifier, max_depth must be defined"
+                    model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
+
+                elseif modelType == :KNeighborsClassifier
+                    n_neighbors = modelHyperparameters["n_neighbors"]
+
+                    @assert n_neighbors.hasKey("n_neighbors") "In KNeighborsClassifier, n_neighbors must be defined"
+
+                    model = KNeighborsClassifier(n_neighbors=n_neighbors)
                 end
 
-            elseif modelType == :DecissionTreeClassifier
-                max_depth = modelHyperparameters["max_depth"]
-
-                @assert max_depth.hasKey("max_depth") "In DecisionTreeClassifier, max_depth must be defined"
-                model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
-
-            elseif modelType == :KNeighborsClassifier
-                n_neighbors = modelHyperparameters["n_neighbors"]
-
-                @assert n_neighbors.hasKey("n_neighbors") "In KNeighborsClassifier, n_neighbors must be defined"
-
-                model = KNeighborsClassifier(n_neighbors=n_neighbors)
+                trainingInputs = inputs[crossValidationIndices .!= 1, :]
+                trainingTargets = targets[crossValidationIndices .!= 1]
+                testingInputs = inputs[crossValidationIndices .== 1, :]
+                testingTargets = targets[crossValidationIndices .== 1]
+    
+                model = fit!(model, trainingInputs, trainingTargets);
+    
+                outputs = predict(model, testingInputs);
+    
+                (accuracyPerTraining[numExecution], errorRatePerTraining[numExecution], 
+                    sensibilityPerTraining[numExecution], specificityPerTraining[numExecution], 
+                    precisionPerTraining[numExecution], negativePredictiveValuesPerTraining[numExecution], 
+                    f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(outputs, testingTargets)
             end
 
-            trainingInputs = inputs[crossValidationIndices .!= 1, :]
-            trainingTargets = targets[crossValidationIndices .!= 1]
-            testingInputs = inputs[crossValidationIndices .== 1, :]
-            testingTargets = targets[crossValidationIndices .== 1]
-
-            model = fit!(model, trainingInputs, trainingTargets);
-
-            outputs = predict(model, testingInputs);
-
-            (acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix) = confusionMatrix(outputs, testingTargets)
-        
         end
+
+        acc = mean(accuracyPerTraining)
+        errorRate = mean(errorRatePerTraining)
+        sensibility = mean(sensibilityPerTraining)
+        specificity = mean(specificityPerTraining)
+        precision = mean(precisionPerTraining)
+        negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
+        f1 = mean(f1PerTraining)
+        matrix = mean(confusionMatrixPerTraining, dims=3)
 
         return (acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
 
