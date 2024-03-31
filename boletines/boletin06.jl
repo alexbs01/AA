@@ -23,13 +23,14 @@ export modelCrossValidation, set_modelHyperparameters
     function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},
         crossValidationIndices::Array{Int64,1})
-
+        println("Model type: ", modelType)
         @assert size(inputs, 1) == size(targets, 1) "Inputs and targets must have the same number of samples"
         @assert (modelType == :SVC) || 
                 (modelType == :DecissionTreeClassifier) || 
                 (modelType == :KNeighborsClassifier) || 
                 (modelType == :ANN) "Model must be SVC, DecissionTreeClassifier, KNeighborsClassifier or ANN"
 
+        println("Model type: ", modelType)
         if modelType == :ANN
             topology = modelHyperparameters["topology"]
             maxEpochs = modelHyperparameters["maxEpochs"]
@@ -89,7 +90,7 @@ export modelCrossValidation, set_modelHyperparameters
             precisionPerTraining = zeros(numExecutions)
             negativePredictiveValuesPerTraining = zeros(numExecutions)
             f1PerTraining = zeros(numExecutions)
-            confusionMatrixPerTraining = zeros(2, 2, numExecutions)
+            confusionMatrixPerTraining = zeros(size(targets, 2), size(targets, 2), numExecutions)
 
             for numExecution in 1:numExecutions
 
@@ -103,7 +104,7 @@ export modelCrossValidation, set_modelHyperparameters
                     @assert kernel in possibleKernel "Kernel must be linear, poly, rbf or sigmoid"
 
                     if kernel == "linear"
-                        @assert C.hasKey("C") "In linear kernel, C must be defined"
+                        #@assert modelCrossValidation.hasKey("C") "In linear kernel, C must be defined"
 
                         model = SVC(kernel=kernel, C=C)
                     
@@ -182,7 +183,7 @@ export modelCrossValidation, set_modelHyperparameters
                 (modelType == :DecissionTreeClassifier) || 
                 (modelType == :KNeighborsClassifier) 
                 "Model must be ANN, SVC, DecissionTreeClassifier or KNeighborsClassifier"
-
+        
         dict = Dict{String, Any}("modelType" => modelType, "kernel" => kernel)
 
         if modelType == :ANN
@@ -190,13 +191,13 @@ export modelCrossValidation, set_modelHyperparameters
             dict["learningRate"] = learningRate
             dict["validationRatio"] = validationRatio
             dict["testRatio"] = testRatio
-            dict["numExecutions"] = numExecutions
             dict["maxEpochs"] = maxEpochs
             dict["maxEpochsVal"] = maxEpochsVal
             dict["transferFunctions"] = transferFunctions
             @assert testRatio + validationRatio < 1.0 "The sum of testRatio and validationRatio must be less than 1"
             
         else
+            println("Model type: ", modelType)
             dict["C"] = C
             dict["degree"] = degree
             dict["gamma"] = gamma
@@ -204,6 +205,8 @@ export modelCrossValidation, set_modelHyperparameters
             dict["n_neighbors"] = n_neighbors
             dict["max_depth"] = max_depth
         end
+
+        dict["numExecutions"] = numExecutions
         
         return dict
     end
