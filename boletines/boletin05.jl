@@ -77,7 +77,6 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),maxEpochs::Int=1000, minLoss::Real=0.0,
     learningRate::Real=0.01,validationRatio::Real=0, maxEpochsVal::Int=20)
 
-<<<<<<< HEAD
      numFolds = maximum(crossValidationIndices);
      
      numClassifiers = length(unique(targets));
@@ -94,20 +93,6 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
      VPNs = zeros(2, numClassifiers, numFolds);
      F1s = zeros(2, numClassifiers, numFolds);
      
-=======
-    numFolds = maximum(crossValidationIndices);
-    
-    numClassifiers = length(unique(targets));
-    
-    precisiones = zeros(1, numClassifiers);
-    tasasError = zeros(1, numClassifiers);
-    sensibilidades = zeros(1, numClassifiers);
-    especificidades = zeros(1, numClassifiers);
-    VPPs = zeros(1, numClassifiers);
-    VPNs = zeros(1, numClassifiers);
-    F1s = zeros(1, numClassifiers);
-    
->>>>>>> c1e38b9d37c8d6b72c555e2770fc1dae4f1f99a2
     targets = oneHotEncoding(targets);
 
     for fold in 1:numFolds
@@ -132,9 +117,9 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         tasasErrorFold = zeros(2, numClassifiers, numExecutions);
         sensibilidadesFold = zeros(2, numClassifiers, numExecutions);
         especificidadesFold = zeros(2, numClassifiers, numExecutions);
-        VPPsFold = zeros(2, numClassifiers, numExecutions, numExecutions);
-        VPNsFold = zeros(2, numClassifiers, numExecutions, numExecutions);
-        F1sFold = zeros(2, numClassifiers, numExecutions, numExecutions);
+        VPPsFold = zeros(2, numClassifiers, numExecutions);
+        VPNsFold = zeros(2, numClassifiers, numExecutions);
+        F1sFold = zeros(2, numClassifiers, numExecutions);
 
         for exec in 1:numExecutions
             #llamar a trainClassAnn y evaluarla con confusionMatrix
