@@ -5,7 +5,7 @@ export crossvalidation, ANNCrossValidation
 
 include("boletin02.jl")
 include("boletin03.jl")
-include ("boletin04.jl")
+include("boletin04.jl")
 import .ANNUtils: oneHotEncoding, trainClassANN
 import .Overtraining: holdOut
 import .Metrics: confusionMatrix
@@ -28,7 +28,7 @@ function crossvalidation(N::Int64, k::Int)
 end
 
 function crossvalidation(targets::AbstractArray{Bool, 1}, k::Int)
-    indexes = zeros(Int64, 1, size(targets, 1));
+    indexes = zeros(Int64, size(targets, 1));
 
     posInstances = findall(targets);
     posGroups = crossvalidation(size(posInstances, 1), k);
@@ -41,15 +41,8 @@ function crossvalidation(targets::AbstractArray{Bool, 1}, k::Int)
     return indexes;
 end
 
-
-    function crossvalidation(targets::AbstractArray{Bool,2}, k::Int)
-        indexes = zeros(Int64, size(targets, 1))
-
-        for numClass = 1:size(targets, 2)
-            class = targets[:, numClass];
-            numElems = sum(class);
 function crossvalidation(targets::AbstractArray{Bool,2}, k::Int)
-    indexes = zeros(Int64, 1, size(targets, 1));
+    indexes = zeros(Int64, size(targets, 1));
     for numClass = 1:size(targets, 2)
         class = targets[:, numClass];
         numElems = sum(class);
@@ -58,16 +51,9 @@ function crossvalidation(targets::AbstractArray{Bool,2}, k::Int)
 
         groups = crossvalidation(numElems, k);
 
-            instances = findall(class);
-            indexes[instances] .= groups;
-        end
-
-        return indexes;
-    end
         instances = findall(class);
         indexes[instances] .= groups;
     end
-
 
     return indexes;
 end
@@ -88,20 +74,20 @@ end
 function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},crossValidationIndices::Array{Int64,1};numExecutions::Int=50,
     transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),maxEpochs::Int=1000, minLoss::Real=0.0,
-     learningRate::Real=0.01,validationRatio::Real=0, maxEpochsVal::Int=20)
+    learningRate::Real=0.01,validationRatio::Real=0, maxEpochsVal::Int=20)
 
-     numFolds = maximum(crossValidationIndices);
-     
-     numClassifiers = length(unique(targets));
-     
-     precisiones = zeros(1, numClassifiers);
-     tasasError = zeros(1, numClassifiers);
-     sensibilidades = zeros(1, numClassifiers);
-     especificidades = zeros(1, numClassifiers);
-     VPPs = zeros(1, numClassifiers);
-     VPNs = zeros(1, numClassifiers);
-     F1s = zeros(1, numClassifiers);
-     
+    numFolds = maximum(crossValidationIndices);
+    
+    numClassifiers = length(unique(targets));
+    
+    precisiones = zeros(1, numClassifiers);
+    tasasError = zeros(1, numClassifiers);
+    sensibilidades = zeros(1, numClassifiers);
+    especificidades = zeros(1, numClassifiers);
+    VPPs = zeros(1, numClassifiers);
+    VPNs = zeros(1, numClassifiers);
+    F1s = zeros(1, numClassifiers);
+    
     targets = oneHotEncoding(targets);
 
     for fold in 1:numFolds
@@ -137,7 +123,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     end
 
     end
- 
+
 end
 
 #PRUEBAS
