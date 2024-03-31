@@ -85,13 +85,13 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         numClassifiers = 1
     end
     
-    precisiones = zeros(numClassifiers, numFolds);
-    tasasError = zeros(numClassifiers,   numFolds);
-    sensibilidades = zeros(numClassifiers, numFolds);
-    especificidades = zeros(numClassifiers, numFolds);
-    VPPs = zeros(numClassifiers, numFolds);
-    VPNs = zeros(numClassifiers, numFolds);
-    F1s = zeros(numClassifiers, numFolds);
+    precisiones = zeros(2, numClassifiers, numFolds);
+    tasasError = zeros(2, numClassifiers, numFolds);
+    sensibilidades = zeros(2, numClassifiers, numFolds);
+    especificidades = zeros(2, numClassifiers, numFolds);
+    VPPs = zeros(2, numClassifiers, numFolds);
+    VPNs = zeros(2, numClassifiers, numFolds);
+    F1s = zeros(2, numClassifiers, numFolds);
     
     targets = oneHotEncoding(targets);
 
@@ -113,7 +113,6 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
             validationTargets = validationTargets[trainIndexes]
         end
 
-        
         precisionesFold = zeros(2, numClassifiers, numExecutions);
         tasasErrorFold = zeros(2, numClassifiers, numExecutions);
         sensibilidadesFold = zeros(2, numClassifiers, numExecutions);
@@ -132,17 +131,16 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
             VPNsFold[exec], F1sFold[exec], _) = confusionMatrix(outputs, targets)
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
-        precisiones[fold] = mean(precisionesFold, dims = 1)
-        tasasError[fold] = mean(tasasErrorFold, dims = 1)
-        sensibilidades[fold] = mean(sensibilidadesFold, dims = 1)
-        especificidades[fold] = mean(especificidadesFold, dims = 1)
-        VPPs[fold] = mean(VPPsFold, dims = 1)
-        VPNs[fold] = mean(VPNsFold, dims = 1)
-        F1s[fold] = mean(F1sFold, dims = 1)
+        precisiones[fold] = mean(precisionesFold)
+        tasasError[fold] = mean(tasasErrorFold)
+        sensibilidades[fold] = mean(sensibilidadesFold)
+        especificidades[fold] = mean(especificidadesFold)
+        VPPs[fold] = mean(VPPsFold)
+        VPNs[fold] = mean(VPNsFold)
+        F1s[fold] = mean(F1sFold)
     end
-    return (mean(precisiones, dims = 1), std(precisiones, dims = 1)), (mean(tasasError, dims = 1), std(tasasError, dims = 1)),
-    (mean(sensibilidades, dims = 1), std(sensibilidades, dims = 1)),(mean(especificidades, dims = 1), std(especificidades, dims = 1)),
-    (mean(VPPs, dims = 1), std(VPPs, dims = 1)), (mean(VPNs, dims = 1), std(VPNs, dims = 1)), (mean(F1s, dims = 1), std(F1s, dims = 1))
+    return (mean(precisiones, std(precisiones))), (mean(tasasError, std(tasasError))), (mean(sensibilidades), std(sensibilidades)),
+     (mean(especificidades), std(especificidades)), (mean(VPPs), std(VPPs)), (mean(VPNs), std(VPNs)), (mean(F1s), std(F1s))
     end
 
 end

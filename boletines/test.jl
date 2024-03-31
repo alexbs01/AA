@@ -294,11 +294,11 @@ function test_modelCrossValidation()
     parameters = set_modelHyperparameters(:ANN, topology=[2, 2], maxEpochs=100, C=1.0)
 
     println(parameters)
-    output_codified = oneHotEncoding(output)
+    output_codified = oneHotEncoding(output[1:90])
     crossValidation = crossvalidation(output_codified, 5)
 
     (acc, errorRate, sensibility, specificity, precision, 
-        negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, crossValidation)
+        negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inputs[1:90, :], output[1:90], crossValidation)
 
     println("Metrics for ANN")
     println("Accuracy: ", acc)
