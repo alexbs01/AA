@@ -16,10 +16,6 @@ export modelCrossValidation, set_modelHyperparameters
     @sk_import tree: DecisionTreeClassifier
     @sk_import neighbors: KNeighborsClassifier
 
-    modelHyperparameters = Dict("topology" => [5,3], "learningRate" => 0.01,
-    "validationRatio" => 0.2, "numExecutions" => 50, "maxEpochs" => 1000,
-    "maxEpochsVal" => 6);
-
     function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},
         crossValidationIndices::Array{Int64,1})
@@ -28,19 +24,37 @@ export modelCrossValidation, set_modelHyperparameters
         @assert (model==:SVC) || (model==:DecissionTreeClassifier) || (model==:KNeighborsClassifier) || (model==:ANN) "Model must be SVC, DecissionTreeClassifier, KNeighborsClassifier or ANN"
 
         if modelType == :ANN
-            targets = oneHotEncoding(targets)
-
-            train, val, test = holdOut(size(inputs, 1), modelHyperparameters["validationRatio"], modelHyperparameters["testRatio"])
             topology = modelHyperparameters["topology"]
             maxEpochs = modelHyperparameters["maxEpochs"]
             maxEpochsVal = modelHyperparameters["maxEpochsVal"]
             learningRate = modelHyperparameters["learningRate"]
             transferFunctions = modelHyperparameters["transferFunctions"]
+            validationRatio = modelHyperparameters["validationRatio"]
+            numExecutions = modelHyperparameters["numExecutions"]
+            
+            targets = oneHotEncoding(targets)
+            trainingInputs = inputs[crossValidationIndices .!= 1, :]
+            trainingTargets = targets[crossValidationIndices .!= 1, :]
+            testingInputs = inputs[crossValidationIndices .== 1, :]
+            testingTargets = targets[crossValidationIndices .== 1, :]
 
-            (bestAnn, trainingLosses, validationLosses, testLosses) = trainClassANN(topology, (inputs[train, :], targets[train, :]), 
-                validationDataset=(inputs[val, :], targets[val, :]), testDataset(inputs[test, :], targets[test, :]), 
-                learningRate=learningRate, maxEpochs=maxEpochs, 
-                maxEpochVal=maxEpochsVal, transferFunctions=transferFunctions)
+            for numExecution in 1:numExecutions
+                if validationRatio > 0.0
+                    train, val, test = holdOut(size(inputs, 1), validationRatio, testRatio)
+
+                    (bestAnn, _, _, _) = trainClassANN(topology, (inputs[train, :], targets[train, :]), 
+                        validationDataset=(inputs[val, :], targets[val, :]), testDataset(inputs[test, :], targets[test, :]), 
+                        learningRate=learningRate, maxEpochs=maxEpochs, 
+                        maxEpochVal=maxEpochsVal, transferFunctions=transferFunctions)
+                else
+                    (bestAnn, _, _, _) = trainClassANN(topology, (trainingInputs, trainingTargets), 
+                        testDataset=(testingInputs, testingTargets), 
+                        learningRate=learningRate, maxEpochs=maxEpochs, 
+                        maxEpochVal=maxEpochsVal, transferFunctions=transferFunctions)
+                end
+            end
+
+            
             
 
         else
@@ -118,16 +132,14 @@ export modelCrossValidation, set_modelHyperparameters
 
     end
 
-    modelHyperparameters = Dict("topology" => [5,3], "learningRate" => 0.01,
-"validationRatio" => 0.2, "numExecutions" => 50, "maxEpochs" => 1000,
-"maxEpochsVal" => 6);
 
     function set_modelHyperparameters(modelType::Symbol; kernel::String="linear", C::Float64=0.0, 
                                         degree::Int64=0, gamma::Float64=0.0, 
                                         coef0::Float64=0.0, topology::Array{Int64,1}=[2,3],
                                         learningRate::Float64=0.01, validationRatio::Float64=0.2,
-                                        numExecutions::Int64=50, maxEpochs::Int64=1000,
-                                        maxEpochsVal::Int64=6, transferFunctions::Array{Function,1}=[Flux.relu, Flux.sigmoid])
+                                        testRatio::Float64=0.1, numExecutions::Int64=50, maxEpochs::Int64=1000,
+                                        maxEpochsVal::Int64=6, transferFunctions::Array{Function,1}=[Flux.relu, Flux.sigmoid],
+                                        n_neighbors::Int64=5, max_depth::Int64=6)
         @assert (modelType == :ANN) || 
                 (modelType == :SVC) || 
                 (modelType == :DecissionTreeClassifier) || 
@@ -145,6 +157,10 @@ export modelCrossValidation, set_modelHyperparameters
             end
             if validationRatio != 0.2
                 dict["validationRatio"] = validationRatio
+            end
+            if testRatio != 0.1
+                dict["testRatio"] = testRatio
+                @assert testRatio + validationRatio < 1.0 "The sum of testRatio and validationRatio must be less than 1"
             end
             if numExecutions != 50
                 dict["numExecutions"] = numExecutions
@@ -171,6 +187,12 @@ export modelCrossValidation, set_modelHyperparameters
             end
             if coef0 != 0.0
                 dict["coef0"] = coef0
+            end
+            if n_neighbors != 5
+                dict["n_neighbors"] = n_neighbors
+            end
+            if max_depth != 6
+                dict["max_depth"] = max_depth
             end
         end
         
