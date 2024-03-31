@@ -24,9 +24,9 @@ test03 = ["holdOut"]
 
 test04 = ["confusionMatrix"]
 
-test06 = ["set_modelHyperparameters"]
+test06 = ["set_modelHyperparameters", "modelCrossValidation"]
         
-tests = ["trainClassANN"]
+tests = ["modelCrossValidation"]
 
 for test in tests
     test_function = Symbol("test_", test) # Convert string to symbol (a function name)

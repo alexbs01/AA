@@ -283,7 +283,26 @@ end
 
 # EJERCICIO 06
 function test_set_modelHyperparameters()
-    parameters1 = set_modelHyperparameters(:SVC, kernel="linear", C=1.0)
+    parameters1 = set_modelHyperparameters(:ANN)
 
     println(parameters1)
+end
+
+function test_modelCrossValidation()
+    parameters = set_modelHyperparameters(:ANN)
+
+    println(parameters)
+
+    (acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, [1, 2, 3, 4, 5])
+    println("Metrics for ANN")
+    println("Accuracy: ", acc)
+    println("Error rate: ", errorRate)
+    println("Sensibility: ", sensibility)
+    println("Specificity: ", specificity)
+    println("Precision: ", precision)
+    println("Negative predictive values: ", negativePredictiveValues)
+    println("F1: ", f1)
+    println("Confusion matrix: ")
+    _print_matrix(matrix)
+    
 end

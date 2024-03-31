@@ -21,7 +21,10 @@ export modelCrossValidation, set_modelHyperparameters
         crossValidationIndices::Array{Int64,1})
 
         @assert size(inputs, 1) == size(targets, 1) "Inputs and targets must have the same number of samples"
-        @assert (model==:SVC) || (model==:DecissionTreeClassifier) || (model==:KNeighborsClassifier) || (model==:ANN) "Model must be SVC, DecissionTreeClassifier, KNeighborsClassifier or ANN"
+        @assert (modelType == :SVC) || 
+                (modelType == :DecissionTreeClassifier) || 
+                (modelType == :KNeighborsClassifier) || 
+                (modelType == :ANN) "Model must be SVC, DecissionTreeClassifier, KNeighborsClassifier or ANN"
 
         if modelType == :ANN
             topology = modelHyperparameters["topology"]
@@ -160,7 +163,7 @@ export modelCrossValidation, set_modelHyperparameters
 
     function set_modelHyperparameters(modelType::Symbol; kernel::String="linear", C::Float64=0.0, 
                                         degree::Int64=0, gamma::Float64=0.0, 
-                                        coef0::Float64=0.0, topology::Array{Int64,1}=[2,3],
+                                        coef0::Float64=0.0, topology::Array{Int64,1}=[2,2],
                                         learningRate::Float64=0.01, validationRatio::Float64=0.2,
                                         testRatio::Float64=0.1, numExecutions::Int64=50, maxEpochs::Int64=1000,
                                         maxEpochsVal::Int64=6, transferFunctions::Array{Function,1}=[Flux.relu, Flux.sigmoid],
@@ -174,51 +177,23 @@ export modelCrossValidation, set_modelHyperparameters
         dict = Dict{String, Any}("modelType" => modelType, "kernel" => kernel)
 
         if modelType == :ANN
-            if topology != [2,3]
-                dict["topology"] = topology
-            end
-            if learningRate != 0.01
-                dict["learningRate"] = learningRate
-            end
-            if validationRatio != 0.2
-                dict["validationRatio"] = validationRatio
-            end
-            if testRatio != 0.1
-                dict["testRatio"] = testRatio
-                @assert testRatio + validationRatio < 1.0 "The sum of testRatio and validationRatio must be less than 1"
-            end
-            if numExecutions != 50
-                dict["numExecutions"] = numExecutions
-            end
-            if maxEpochs != 1000
-                dict["maxEpochs"] = maxEpochs
-            end
-            if maxEpochsVal != 6
-                dict["maxEpochsVal"] = maxEpochsVal
-            end
-            if transferFunctions != [Flux.relu, Flux.sigmoid]
-                dict["transferFunctions"] = transferFunctions
-            end
+            dict["topology"] = topology
+            dict["learningRate"] = learningRate
+            dict["validationRatio"] = validationRatio
+            dict["testRatio"] = testRatio
+            dict["numExecutions"] = numExecutions
+            dict["maxEpochs"] = maxEpochs
+            dict["maxEpochsVal"] = maxEpochsVal
+            dict["transferFunctions"] = transferFunctions
+            @assert testRatio + validationRatio < 1.0 "The sum of testRatio and validationRatio must be less than 1"
+            
         else
-            if C != 0.0
-                dict["C"] = C
-            end
-            if degree != 0
-                print("Degree:")
-                dict["degree"] = degree
-            end
-            if gamma != 0.0
-                dict["gamma"] = gamma
-            end
-            if coef0 != 0.0
-                dict["coef0"] = coef0
-            end
-            if n_neighbors != 5
-                dict["n_neighbors"] = n_neighbors
-            end
-            if max_depth != 6
-                dict["max_depth"] = max_depth
-            end
+            dict["C"] = C
+            dict["degree"] = degree
+            dict["gamma"] = gamma
+            dict["coef0"] = coef0
+            dict["n_neighbors"] = n_neighbors
+            dict["max_depth"] = max_depth
         end
         
         return dict
