@@ -113,6 +113,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
             validationTargets = validationTargets[trainIndexes]
         end
 
+        
         precisionesFold = zeros(2, numClassifiers, numExecutions);
         tasasErrorFold = zeros(2, numClassifiers, numExecutions);
         sensibilidadesFold = zeros(2, numClassifiers, numExecutions);
