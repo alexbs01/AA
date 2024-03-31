@@ -10,6 +10,7 @@ using Flux.Losses;
 include("boletin02.jl");
 include("boletin03.jl");
 include("boletin04.jl");
+include("boletin05.jl");
 include("boletin06.jl");
 import .ANNUtils: oneHotEncoding, calculateMinMaxNormalizationParameters, 
                 calculateZeroMeanNormalizationParameters, normalizeMinMax,
@@ -18,6 +19,7 @@ import .ANNUtils: oneHotEncoding, calculateMinMaxNormalizationParameters,
                 
 import .Overtraining: holdOut;
 import .Metrics: confusionMatrix, printConfusionMatrix;
+import .CrossValidation: crossvalidation, ANNCrossValidation;
 import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 dataset = readdlm("boletines/iris/iris.data", ',');
@@ -292,8 +294,13 @@ function test_modelCrossValidation()
     parameters = set_modelHyperparameters(:ANN)
 
     println(parameters)
+    output_codified = oneHotEncoding(output)
+    crossValidation = crossvalidation(output_codified, 5)'
+    println("Cross validation: ", crossValidation)
+    println(typeof(crossValidation))
+    (acc, errorRate, sensibility, specificity, precision, 
+        negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, crossValidation)
 
-    (acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, [1, 2, 3, 4, 5])
     println("Metrics for ANN")
     println("Accuracy: ", acc)
     println("Error rate: ", errorRate)
