@@ -235,9 +235,9 @@ export oneHotEncoding, calculateMinMaxNormalizationParameters, calculateZeroMean
                     numEpochVal += 1
                 end
             
-                println("Epoch ", numEpoch, ": loss: ", trainingLoss, " validation loss: ", validationLoss, " test loss: ", testLoss)
+                #println("Epoch ", numEpoch, ": loss: ", trainingLoss, " validation loss: ", validationLoss, " test loss: ", testLoss)
             else
-                println("Epoch ", numEpoch, ": loss: ", trainingLoss)
+                #println("Epoch ", numEpoch, ": loss: ", trainingLoss)
             end
 
             

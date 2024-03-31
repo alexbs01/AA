@@ -8,11 +8,18 @@ export confusionMatrix, printConfusionMatrix
     function _accuracy(confusionMatrix::AbstractArray{Int64,2})
         numerator = 0
         rows = size(confusionMatrix, 1)
+
         for i in 1:rows
             numerator += confusionMatrix[i,i]
         end
 
-        denominator = sum(confusionMatrix)
+        
+        denominator = sum(confusionMatrix[:, :])
+
+        if denominator <= 0
+            println("DDDDDDDDDDDD")
+            println(denominator)
+        end
 
         return numerator / denominator
     end
@@ -106,6 +113,9 @@ export confusionMatrix, printConfusionMatrix
         matrix[2,1] = sum(outputs[num_falses] .== false) # False negatives
         matrix[2,2] = sum(outputs[num_trues] .== true)   # True positives
 
+        println("B")
+        println(matrix)
+
         accuracy = _accuracy(matrix)
         errorRate = _errorRate(matrix)
         sensitivity = _sensitivity(matrix)
@@ -113,6 +123,8 @@ export confusionMatrix, printConfusionMatrix
         precision = _precision(matrix)
         negativePredictiveValue = _negativePredictiveValue(matrix)
         f1Score = _f1Score(matrix)
+
+        println("\n\n")
 
         return (accuracy, errorRate, sensitivity, specificity, precision, negativePredictiveValue, f1Score, matrix)
     end

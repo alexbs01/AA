@@ -23,14 +23,13 @@ export modelCrossValidation, set_modelHyperparameters
     function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},
         crossValidationIndices::Array{Int64,1})
-        println("Model type: ", modelType)
+
         @assert size(inputs, 1) == size(targets, 1) "Inputs and targets must have the same number of samples"
         @assert (modelType == :SVC) || 
                 (modelType == :DecissionTreeClassifier) || 
                 (modelType == :KNeighborsClassifier) || 
                 (modelType == :ANN) "Model must be SVC, DecissionTreeClassifier, KNeighborsClassifier or ANN"
 
-        println("Model type: ", modelType)
         if modelType == :ANN
             topology = modelHyperparameters["topology"]
             maxEpochs = modelHyperparameters["maxEpochs"]
@@ -42,10 +41,14 @@ export modelCrossValidation, set_modelHyperparameters
             numExecutions = modelHyperparameters["numExecutions"]
             
             targets = oneHotEncoding(targets)
-            trainingInputs = inputs[crossValidationIndices .!= 1, :]
-            trainingTargets = targets[crossValidationIndices .!= 1, :]
-            testingInputs = inputs[crossValidationIndices .== 1, :]
-            testingTargets = targets[crossValidationIndices .== 1, :]
+
+            trainIndex = findall(crossValidationIndices .!= 1)
+            testIndex = findall(crossValidationIndices .== 1)
+
+            trainingInputs = inputs[trainIndex, :]
+            trainingTargets = targets[trainIndex, :]
+            testingInputs = inputs[testIndex, :]
+            testingTargets = targets[testIndex, :]
 
             accuracyPerTraining = zeros(numExecutions)
             errorRatePerTraining = zeros(numExecutions)
@@ -71,13 +74,18 @@ export modelCrossValidation, set_modelHyperparameters
                         maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions)
                 end
                 
+                println("AAAAAAAAAAAA")
                 println(collect(bestAnn(testingInputs')'))
                 println(testingTargets)
 
-                (accuracyPerTraining[numExecution], errorRatePerTraining[numExecution], 
-                    sensibilityPerTraining[numExecution], specificityPerTraining[numExecution], 
-                    precisionPerTraining[numExecution], negativePredictiveValuesPerTraining[numExecution], 
-                    f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(collect(bestAnn(testingInputs')'), testingTargets)
+                (accuracyPerTraining[numExecution], 
+                errorRatePerTraining[numExecution], 
+                sensibilityPerTraining[numExecution], 
+                specificityPerTraining[numExecution], 
+                precisionPerTraining[numExecution], 
+                negativePredictiveValuesPerTraining[numExecution], 
+                f1PerTraining[numExecution], 
+                confusionMatrixPerTraining[:, :, numExecution]) = confusionMatrix(collect(bestAnn(testingInputs')'), testingTargets)
             end
 
         else
