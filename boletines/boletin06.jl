@@ -5,14 +5,17 @@ using Pkg
 include("boletin02.jl");
 include("boletin03.jl");
 include("boletin04.jl");
+include("boletin05.jl");
 using ScikitLearn
 using ScikitLearn: fit!, predict
 using Flux
 using Flux.Losses
 using Statistics
-using .Metrics: confusionMatrix
-using .ANNUtils: oneHotEncoding, trainClassANN
-using .Overtraining: holdOut
+
+import .Metrics: confusionMatrix
+import .ANNUtils: oneHotEncoding, trainClassANN
+import .Overtraining: holdOut
+import .CrossValidation: ANNCrossValidation
 
 export modelCrossValidation, set_modelHyperparameters
 
@@ -41,44 +44,9 @@ export modelCrossValidation, set_modelHyperparameters
             testRatio = modelHyperparameters["testRatio"]
             numExecutions = modelHyperparameters["numExecutions"]
             
-            targets = oneHotEncoding(targets)
-            trainingInputs = inputs[crossValidationIndices .!= 1, :]
-            trainingTargets = targets[crossValidationIndices .!= 1, :]
-            testingInputs = inputs[crossValidationIndices .== 1, :]
-            testingTargets = targets[crossValidationIndices .== 1, :]
 
-            accuracyPerTraining = zeros(numExecutions)
-            errorRatePerTraining = zeros(numExecutions)
-            sensibilityPerTraining = zeros(numExecutions)
-            specificityPerTraining = zeros(numExecutions)
-            precisionPerTraining = zeros(numExecutions)
-            negativePredictiveValuesPerTraining = zeros(numExecutions)
-            f1PerTraining = zeros(numExecutions)
-            confusionMatrixPerTraining = zeros(size(targets, 2), size(targets, 2), numExecutions)
+            ANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions, maxEpochs, minLoss, learningRate, maxEpochsVal)
 
-            for numExecution in 1:numExecutions
-                if validationRatio > 0.0
-                    train, val, test = holdOut(size(inputs, 1), validationRatio, testRatio)
-
-                    (bestAnn, _, _, _) = trainClassANN(topology, (inputs[train, :], targets[train, :]), 
-                        validationDataset=(inputs[val, :], targets[val, :]), testDataset=(inputs[test, :], targets[test, :]), 
-                        learningRate=learningRate, maxEpochs=maxEpochs, 
-                        maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions)
-                else
-                    (bestAnn, _, _, _) = trainClassANN(topology, (trainingInputs, trainingTargets), 
-                        testDataset=(testingInputs, testingTargets), 
-                        learningRate=learningRate, maxEpochs=maxEpochs, 
-                        maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions)
-                end
-                
-                println(collect(bestAnn(testingInputs')'))
-                println(testingTargets)
-
-                (accuracyPerTraining[numExecution], errorRatePerTraining[numExecution], 
-                    sensibilityPerTraining[numExecution], specificityPerTraining[numExecution], 
-                    precisionPerTraining[numExecution], negativePredictiveValuesPerTraining[numExecution], 
-                    f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(collect(bestAnn(testingInputs')'), testingTargets)
-            end
 
         else
             numExecutions = modelHyperparameters["numExecutions"]
@@ -143,17 +111,17 @@ export modelCrossValidation, set_modelHyperparameters
                     f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(outputs, testingTargets)
             end
 
-        end
+            acc = mean(accuracyPerTraining)
+            println(accuracyPerTraining)
+            errorRate = mean(errorRatePerTraining)
+            sensibility = mean(sensibilityPerTraining)
+            specificity = mean(specificityPerTraining)
+            precision = mean(precisionPerTraining)
+            negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
+            f1 = mean(f1PerTraining)
+            matrix = mean(confusionMatrixPerTraining, dims=3)
 
-        acc = mean(accuracyPerTraining)
-        println(accuracyPerTraining)
-        errorRate = mean(errorRatePerTraining)
-        sensibility = mean(sensibilityPerTraining)
-        specificity = mean(specificityPerTraining)
-        precision = mean(precisionPerTraining)
-        negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
-        f1 = mean(f1PerTraining)
-        matrix = mean(confusionMatrixPerTraining, dims=3)
+        end
 
         return (acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
 
