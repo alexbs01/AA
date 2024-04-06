@@ -285,13 +285,13 @@ end
 
 # EJERCICIO 06
 function test_set_modelHyperparameters()
-    parameters1 = set_modelHyperparameters(:ANN)
+    parameters1 = set_modelHyperparameters()
 
     println(parameters1)
 end
 
 function test_modelCrossValidation()
-    parameters = set_modelHyperparameters(:DecissionTreeClassifier, topology=[2, 2], maxEpochs=10, C=1.0)
+    parameters = set_modelHyperparameters(topology=[2, 2], maxEpochs=10, C=1.0)
 
     println(parameters)
     output_codified = oneHotEncoding(output)

@@ -172,41 +172,39 @@ export modelCrossValidation, set_modelHyperparameters
     end
 
 
-    function set_modelHyperparameters(modelType::Symbol; kernel::String="linear", C::Float64=0.0, 
+    function set_modelHyperparameters(; kernel::String="linear", C::Float64=0.0, 
                                         degree::Int64=0, gamma::Float64=0.0, 
                                         coef0::Float64=0.0, topology::Array{Int64,1}=[2,2],
                                         learningRate::Float64=0.01, validationRatio::Float64=0.2,
                                         testRatio::Float64=0.1, numExecutions::Int64=50, maxEpochs::Int64=1000,
                                         maxEpochsVal::Int64=6, transferFunctions::Array{Function,1}=[Flux.relu, Flux.sigmoid],
                                         n_neighbors::Int64=5, max_depth::Int64=6)
-        @assert (modelType == :ANN) || 
-                (modelType == :SVC) || 
-                (modelType == :DecissionTreeClassifier) || 
-                (modelType == :KNeighborsClassifier) 
-                "Model must be ANN, SVC, DecissionTreeClassifier or KNeighborsClassifier"
+
         
-        dict = Dict{String, Any}("modelType" => modelType, "kernel" => kernel)
+        dict = Dict{String, Any}()
 
-        if modelType == :ANN
-            dict["topology"] = topology
-            dict["learningRate"] = learningRate
-            dict["validationRatio"] = validationRatio
-            dict["testRatio"] = testRatio
-            dict["maxEpochs"] = maxEpochs
-            dict["maxEpochsVal"] = maxEpochsVal
-            dict["transferFunctions"] = transferFunctions
-            @assert testRatio + validationRatio < 1.0 "The sum of testRatio and validationRatio must be less than 1"
-            
-        else
-            println("Model type: ", modelType)
-            dict["C"] = C
-            dict["degree"] = degree
-            dict["gamma"] = gamma
-            dict["coef0"] = coef0
-            dict["n_neighbors"] = n_neighbors
-            dict["max_depth"] = max_depth
-        end
+        # Params for ANN
+        dict["topology"] = topology
+        dict["learningRate"] = learningRate
+        dict["validationRatio"] = validationRatio
+        dict["testRatio"] = testRatio
+        dict["maxEpochs"] = maxEpochs
+        dict["maxEpochsVal"] = maxEpochsVal
+        dict["transferFunctions"] = transferFunctions
+        @assert testRatio + validationRatio < 1.0 "The sum of testRatio and validationRatio must be less than 1"
+        
+        # Params for SVC, DecissionTreeClassifier and KNeighborsClassifier
+        dict["kernel"] = kernel
+        dict["C"] = C
+        dict["degree"] = degree
+        dict["gamma"] = gamma
+        dict["coef0"] = coef0
 
+        dict["max_depth"] = max_depth
+
+        dict["n_neighbors"] = n_neighbors
+
+        # Common params
         dict["numExecutions"] = numExecutions
         
         return dict
