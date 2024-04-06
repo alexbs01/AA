@@ -1,0 +1,463 @@
+Metrics for SVC with kernel: linear
+Parameters:
+        C: 0.1
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: linear
+Parameters:
+        C: 0.5
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: linear
+Parameters:
+        C: 1.0
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: linear
+Parameters:
+        C: 2.0
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: linear
+Parameters:
+        C: 5.0
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: linear
+Parameters:
+        C: 10.0
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: poly
+Parameters:
+        C: 1.0
+        Degree: 1
+        Gamma: 0.8
+        Coef0: 1.5
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: poly
+Parameters:
+        C: 2.0
+        Degree: 2
+        Gamma: 0.1
+        Coef0: 2.5
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: poly
+Parameters:
+        C: 2.0
+        Degree: 3
+        Gamma: 0.4
+        Coef0: 1.5
+Accuracy: 0.8797868797868797
+Error rate: 0.12021312021312021
+Sensibility: 0.9961685823754789
+Specificity: 0.10687022900763359
+Precision: 0.8810572687224669
+Negative predictive values: 0.10687022900763359
+F1: 0.934367650519403
+Confusion matrix: 
+42.0    351.0
+10.0    2600.0
+
+Metrics for SVC with kernel: poly
+Parameters:
+        C: 2.0
+        Degree: 4
+        Gamma: 1.2
+        Coef0: 1.5
+Accuracy: 0.8861138861138861
+Error rate: 0.11388611388611387
+Sensibility: 0.9888888888888888
+Specificity: 0.20356234096692108
+Precision: 0.891845196959226
+Negative predictive values: 0.20356234096692108
+F1: 0.9346846713513577
+Confusion matrix: 
+80.0    313.0
+29.0    2581.0
+
+Metrics for SVC with kernel: poly
+Parameters:
+        C: 2.0
+        Degree: 3
+        Gamma: 1.5
+        Coef0: 1.5
+Accuracy: 0.8837828837828837
+Error rate: 0.11621711621711622
+Sensibility: 0.9888888888888888
+Specificity: 0.1857506361323155
+Precision: 0.8896932092381937
+Negative predictive values: 0.1857506361323155
+F1: 0.9333862844701034
+Confusion matrix: 
+73.0    320.0
+29.0    2581.0
+
+Metrics for SVC with kernel: rbf
+Parameters:
+        C: 1.0
+        Gamma: 1.0
+Accuracy: 0.8787878787878788
+Error rate: 0.12121212121212122
+Sensibility: 0.9980842911877394
+Specificity: 0.08651399491094146
+Precision: 0.8788798920377868
+Negative predictive values: 0.08651399491094146
+F1: 0.9346447681791469
+Confusion matrix: 
+34.0    359.0
+5.0     2605.0
+
+Metrics for SVC with kernel: rbf
+Parameters:
+        C: 2.0
+        Gamma: 0.7
+Accuracy: 0.8807858807858807
+Error rate: 0.1192141192141192
+Sensibility: 0.9969348659003832
+Specificity: 0.1094147582697201
+Precision: 0.8814363143631436
+Negative predictive values: 0.1094147582697201
+F1: 0.9352680961722757
+Confusion matrix: 
+43.0    350.0
+8.0     2602.0
+
+Metrics for SVC with kernel: rbf
+Parameters:
+        C: 3.0
+        Gamma: 0.3
+Accuracy: 0.8704628704628703
+Error rate: 0.12953712953712956
+Sensibility: 0.9996168582375479
+Specificity: 0.012722646310432567
+Precision: 0.8705372038705373
+Negative predictive values: 0.012722646310432567
+F1: 0.9305799602343313
+Confusion matrix: 
+5.0     388.0
+1.0     2609.0
+
+Metrics for SVC with kernel: rbf
+Parameters:
+        C: 2.0
+        Gamma: 0.1
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: rbf
+Parameters:
+        C: 3.5
+        Gamma: 0.5
+Accuracy: 0.8817848817848818
+Error rate: 0.1182151182151182
+Sensibility: 0.9961685823754789
+Specificity: 0.12213740458015267
+Precision: 0.8828522920203735
+Negative predictive values: 0.12213740458015267
+F1: 0.9354932509368791
+Confusion matrix: 
+48.0    345.0
+10.0    2600.0
+
+Metrics for SVC with kernel: sigmoid
+Parameters:
+        C: 1.0
+        Gamma: 1.3
+        Coef0: 1.0
+Accuracy: 0.7678987678987679
+Error rate: 0.23210123210123207
+Sensibility: 0.8758620689655171
+Specificity: 0.05089058524173027
+Precision: 0.8597216998871755
+Negative predictive values: 0.05089058524173027
+F1: 0.8183348678520883
+Confusion matrix: 
+20.0    373.0
+324.0   2286.0
+
+Metrics for SVC with kernel: sigmoid
+Parameters:
+        C: 1.5
+        Gamma: 0.5
+        Coef0: 3.5
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: sigmoid
+Parameters:
+        C: 2.0
+        Gamma: 1.3
+        Coef0: 7.5
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: sigmoid
+Parameters:
+        C: 1.2
+        Gamma: 0.2
+        Coef0: 8.0
+Accuracy: 0.8691308691308691
+Error rate: 0.13086913086913088
+Sensibility: 1.0
+Specificity: 0.0
+Precision: 0.8691308691308691
+Negative predictive values: 0.0
+F1: 0.9299839657936931
+Confusion matrix: 
+0.0     393.0
+0.0     2610.0
+
+Metrics for SVC with kernel: sigmoid
+Parameters:
+        C: 1.5
+        Gamma: 0.7
+        Coef0: 1.5
+Accuracy: 0.7975357975357976
+Error rate: 0.20246420246420244
+Sensibility: 0.9091954022988505
+Specificity: 0.055979643765903316
+Precision: 0.864795918367347
+Negative predictive values: 0.055979643765903316
+F1: 0.8497130425207495
+Confusion matrix: 
+22.0    371.0
+237.0   2373.0
+
+Metrics for DecisionTreeClassifier
+Parameters:
+        Max depth: 3
+Accuracy: 0.8774558774558776
+Error rate: 0.12254412254412256
+Sensibility: 0.9954022988505747
+Specificity: 0.094147582697201
+Precision: 0.8794854434664862
+Negative predictive values: 0.094147582697201
+F1: 0.9327151501477198
+Confusion matrix: 
+37.0    356.0
+12.0    2598.0
+
+Metrics for DecisionTreeClassifier
+Parameters:
+        Max depth: 6
+Accuracy: 0.8787878787878788
+Error rate: 0.12121212121212122
+Sensibility: 0.9743295019157087
+Specificity: 0.24427480916030533
+Precision: 0.8954225352112676
+Negative predictive values: 0.24427480916030533
+F1: 0.9240957590110834
+Confusion matrix: 
+96.0    297.0
+67.0    2543.0
+
+Metrics for DecisionTreeClassifier
+Parameters:
+        Max depth: 12
+Accuracy: 0.8704628704628703
+Error rate: 0.12953712953712956
+Sensibility: 0.9406130268199234
+Specificity: 0.4045801526717557
+Precision: 0.9129788025288212
+Negative predictive values: 0.4045801526717557
+F1: 0.9041793516758301
+Confusion matrix: 
+159.0   234.0
+155.0   2455.0
+
+Metrics for DecisionTreeClassifier
+Parameters:
+        Max depth: 18
+Accuracy: 0.8611388611388613
+Error rate: 0.13886113886113885
+Sensibility: 0.924904214559387
+Specificity: 0.4376590330788804
+Precision: 0.9161290322580646
+Negative predictive values: 0.4376590330788804
+F1: 0.8918832617481252
+Confusion matrix: 
+172.0   221.0
+196.0   2414.0
+
+Metrics for DecisionTreeClassifier
+Parameters:
+        Max depth: 24
+Accuracy: 0.8638028638028638
+Error rate: 0.1361971361971362
+Sensibility: 0.9260536398467434
+Specificity: 0.45038167938931295
+Precision: 0.9179642992783897
+Negative predictive values: 0.45038167938931295
+F1: 0.8938457183618798
+Confusion matrix: 
+177.0   216.0
+193.0   2417.0
+
+Metrics for KNeighborsClassifier
+Parameters:
+        n_neighbors: 3
+Accuracy: 0.8884448884448883
+Error rate: 0.11155511155511157
+Sensibility: 0.9478927203065133
+Specificity: 0.49363867684478374
+Precision: 0.9255518144407034
+Negative predictive values: 0.49363867684478374
+F1: 0.9172065508401295
+Confusion matrix: 
+194.0   199.0
+136.0   2474.0
+
+Metrics for KNeighborsClassifier
+Parameters:
+        n_neighbors: 5
+Accuracy: 0.8964368964368964
+Error rate: 0.10356310356310355
+Sensibility: 0.9590038314176246
+Specificity: 0.4809160305343512
+Precision: 0.9246398226819356
+Negative predictive values: 0.4809160305343512
+F1: 0.9266654605573725
+Confusion matrix: 
+189.0   204.0
+107.0   2503.0
+
+Metrics for KNeighborsClassifier
+Parameters:
+        n_neighbors: 7
+Accuracy: 0.8954378954378953
+Error rate: 0.10456210456210456
+Sensibility: 0.9620689655172413
+Specificity: 0.45292620865139954
+Precision: 0.9211298606016141
+Negative predictive values: 0.45292620865139954
+F1: 0.9275583610021223
+Confusion matrix: 
+178.0   215.0
+99.0    2511.0
+
+Metrics for KNeighborsClassifier
+Parameters:
+        n_neighbors: 9
+Accuracy: 0.8964368964368964
+Error rate: 0.10356310356310355
+Sensibility: 0.9628352490421455
+Specificity: 0.4554707379134861
+Precision: 0.9215254858819216
+Negative predictive values: 0.4554707379134861
+F1: 0.9284504632956828
+Confusion matrix: 
+179.0   214.0
+97.0    2513.0
+
+Metrics for KNeighborsClassifier
+Parameters:
+        n_neighbors: 11
+Accuracy: 0.8974358974358975
+Error rate: 0.10256410256410257
+Sensibility: 0.9651340996168583
+Specificity: 0.4478371501272265
+Precision: 0.9206871345029239
+Negative predictive values: 0.4478371501272265
+F1: 0.9300546966891889
+Confusion matrix: 
+176.0   217.0
+91.0    2519.0

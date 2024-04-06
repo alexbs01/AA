@@ -158,7 +158,7 @@ export modelCrossValidation, set_modelHyperparameters
         end
 
         acc = mean(accuracyPerTraining)
-        println(accuracyPerTraining)
+        #println(accuracyPerTraining)
         errorRate = mean(errorRatePerTraining)
         sensibility = mean(sensibilityPerTraining)
         specificity = mean(specificityPerTraining)
