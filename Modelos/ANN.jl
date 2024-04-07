@@ -274,4 +274,6 @@ ann = trainClassANN(
 
 save("annAndLoss.jld2", "topology", topology, "ann", ann[1], "lossTr", ann[2], "lossVl", ann[3], "lossTs", ann[4])
 
-include("metrics.jl")
+include("../metrics.jl")
+
+calculateMetrics()

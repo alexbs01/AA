@@ -48,12 +48,40 @@ function printConfusionMatrix(outputs::AbstractArray{<:Real,1},
   printConfusionMatrix(broadcast(>=, outputs, threshold), targets)
 end
 
-ann = load("annAndLoss.jld2", "ann")
-inTs = load("VH-VL.jld2", "inTs")
-trTs = load("VH-VL.jld2", "trTs")
-topology = load("annAndLoss.jld2", "topology")
+function calculateMetrics()
+  ann = load("annAndLoss.jld2", "ann")
+  inTs = load("VH-VL.jld2", "inTs")
+  trTs = load("VH-VL.jld2", "trTs")
+  topology = load("annAndLoss.jld2", "topology")
 
-outputs = ann(inTs')
+  outputs = ann(inTs')
 
-println(topology)
-printConfusionMatrix(vec(outputs'), vec(trTs'))
+  println(topology)
+  printConfusionMatrix(vec(outputs'), vec(trTs'))
+end
+
+
+
+function _show_metrics(acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
+  println("Accuracy: ", acc)
+  println("Error rate: ", errorRate)
+  println("Sensibility: ", sensibility)
+  println("Specificity: ", specificity)
+  println("Precision: ", precision)
+  println("Negative predictive values: ", negativePredictiveValues)
+  println("F1: ", f1)
+  println("Confusion matrix: ")
+  _print_matrix(matrix)
+end
+
+
+function _print_matrix(matrix)
+  rows, cols = size(matrix)
+  for i in 1:rows
+    for j in 1:cols
+      print(matrix[i, j], "\t")
+    end
+    println()
+  end
+end
+
