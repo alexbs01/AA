@@ -283,7 +283,28 @@ function test_confusionMatrix()
     printConfusionMatrix(outputs_real, targets, weighted=false)
 end
 
-# EJERCICIO 06
+# BOLETÍN 05
+function test_crossvalidation()
+
+    testCategories = ["red", "blue", "red", "green", "red", "green", "red", "blue", "green", "green", "blue", "blue"];
+    testCategories2 = ["red", "blue", "red", "red", "blue", "blue", "blue", "red", "blue", "blue", "red", "red", "blue", "red", "blue"];
+    
+
+    println(crossvalidation(testCategories, 4));
+    println(crossvalidation(testCategories2, 4));
+end
+
+function test_ANNCrossvalidation()
+
+    norm_inputs = normalizeMinMax(inputs);
+
+    indicesCrossValidation = crossvalidation(output, 4);
+
+    println(ANNCrossValidation([5], norm_inputs, output, indicesCrossValidation, maxEpochs = 5));
+end
+
+
+# BOLETÍN 06
 function test_set_modelHyperparameters()
     parameters1 = set_modelHyperparameters()
 
