@@ -12,17 +12,17 @@ include("boletin03.jl");
 include("boletin04.jl");
 include("boletin05.jl");
 include("boletin06.jl");
-import .ANNUtils: oneHotEncoding, calculateMinMaxNormalizationParameters, 
-                calculateZeroMeanNormalizationParameters, normalizeMinMax,
-                normalizeMinMax!, normalizeZeroMean, normalizeZeroMean!, 
-                classifyOutputs, accuracy, buildClassANN, trainClassANN;
-                
+import .ANNUtils: oneHotEncoding, calculateMinMaxNormalizationParameters,
+    calculateZeroMeanNormalizationParameters, normalizeMinMax,
+    normalizeMinMax!, normalizeZeroMean, normalizeZeroMean!,
+    classifyOutputs, accuracy, buildClassANN, trainClassANN;
+
 import .Overtraining: holdOut;
 import .Metrics: confusionMatrix, printConfusionMatrix;
 import .CrossValidation: crossvalidation, ANNCrossValidation;
 import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
-dataset = readdlm("boletines/iris/iris.data", ',');
+dataset = readdlm("fonts/iris/iris.data", ',');
 
 inputs = Float32.(dataset[:, 1:4]);
 output = dataset[:, end];
@@ -155,24 +155,24 @@ end
 
 function test_accuracy()
     # ACCURACY
-    out =     Bool[1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1]
+    out = Bool[1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1]
     targets = Bool[1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0]
-    println("\nAccuracy wiht ", size(out, 2) ," feature and ", size(out, 1), " samples")
+    println("\nAccuracy wiht ", size(out, 2), " feature and ", size(out, 1), " samples")
     println("Outputs: ", out)
     println("Targets: ", targets)
     println("Accuracy: ", accuracy(out, targets))
 
-    out =     Bool[1 1 1 1 1; 1 1 1 1 1; 1 1 1 1 1; 1 1 1 1 1]
+    out = Bool[1 1 1 1 1; 1 1 1 1 1; 1 1 1 1 1; 1 1 1 1 1]
     targets = Bool[1 1 1 1 1; 1 1 1 1 1; 1 1 1 1 1; 0 1 1 1 1]
-    println("\nAccuracy with ", size(out, 2) ," features and ", size(out, 1), " samples")
+    println("\nAccuracy with ", size(out, 2), " features and ", size(out, 1), " samples")
     println(size(out))
     println("Outputs: ", out)
     println("Targets: ", targets)
     println("Accuracy: ", accuracy(out, targets))
 
-    out =     Bool[1 1; 1 1; 1 1; 1 1]
+    out = Bool[1 1; 1 1; 1 1; 1 1]
     targets = Bool[1 1; 1 1; 1 1; 0 1]
-    println("\nAccuracy with ", size(out, 2) ," features and ", size(out, 1), " samples")
+    println("\nAccuracy with ", size(out, 2), " features and ", size(out, 1), " samples")
     println(size(out))
     println("Outputs: ", out)
     println("Targets: ", targets)
@@ -181,7 +181,7 @@ function test_accuracy()
     out = inputs[1:11, 1]
     targets = Bool[1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0]
     threshold = 5
-    println("\nAccuracy wiht ", size(out, 2) ," feature and ", size(out, 1), " samples")
+    println("\nAccuracy wiht ", size(out, 2), " feature and ", size(out, 1), " samples")
     println("Outputs: ", out)
     println("Targets: ", targets)
     println("Accuracy: ", accuracy(out, targets, threshold=threshold))
@@ -189,7 +189,7 @@ function test_accuracy()
     out = inputs[1:4, 1:4]
     targets = Bool[1 1 0 0; 1 1 0 0; 1 1 0 0; 0 0 1 1]
     threshold = 2
-    println("\nAccuracy with ", size(out, 2) ," features and ", size(out, 1), " samples")
+    println("\nAccuracy with ", size(out, 2), " features and ", size(out, 1), " samples")
     println("Outputs: ")
     _print_matrix(out)
     println("Targets: ", targets)
@@ -197,7 +197,7 @@ function test_accuracy()
 end
 
 function test_buildClassANN()
-    println("\n",buildClassANN(1, [1, 2, 3], 3))
+    println("\n", buildClassANN(1, [1, 2, 3], 3))
     println(buildClassANN(3, [2], 2))
     println(buildClassANN(4, [3, 2, 3], 2, transferFunctions=[relu, relu, relu]))
 end
@@ -205,12 +205,12 @@ end
 function test_trainClassANN()
     test_inputs = normalizeMinMax(inputs)
     test_targets = oneHotEncoding(output)
-    println("\n",trainClassANN([1, 2, 3], (test_inputs, test_targets), maxEpochs=4))
-    println("\n",trainClassANN([2], (test_inputs, test_targets), maxEpochs=3))
-    println("\n",trainClassANN([3, 2, 3], (test_inputs, test_targets), transferFunctions=[relu, relu, relu], maxEpochs=5))
+    println("\n", trainClassANN([1, 2, 3], (test_inputs, test_targets), maxEpochs=4))
+    println("\n", trainClassANN([2], (test_inputs, test_targets), maxEpochs=3))
+    println("\n", trainClassANN([3, 2, 3], (test_inputs, test_targets), transferFunctions=[relu, relu, relu], maxEpochs=5))
 
     test_targets = oneHotEncoding(output[1:90])
-    println("\n",trainClassANN([2, 2, 2], (test_inputs[1:90, :], test_targets), maxEpochs=6))
+    println("\n", trainClassANN([2, 2, 2], (test_inputs[1:90, :], test_targets), maxEpochs=6))
 
     inputs_copy = normalizeMinMax(inputs)
     targets_copy = oneHotEncoding(output)
@@ -220,16 +220,16 @@ function test_trainClassANN()
     train, validation, test = holdOut(N, Pval, Ptest)
 
     println("\nTesting with validation and test datasets")
-    println("\n",trainClassANN([1, 2, 3], (inputs_copy[train, :], targets_copy[train, :]), 
-        validationDataset=(inputs_copy[validation, :], targets_copy[validation, :]), 
+    println("\n", trainClassANN([1, 2, 3], (inputs_copy[train, :], targets_copy[train, :]),
+        validationDataset=(inputs_copy[validation, :], targets_copy[validation, :]),
         testDataset=(inputs_copy[test, :], targets_copy[test, :]), maxEpochs=4))
 
-    println("\n",trainClassANN([2], (inputs_copy[train, :], targets_copy[train, :]), 
-        validationDataset=(inputs_copy[validation, :], targets_copy[validation, :]), 
+    println("\n", trainClassANN([2], (inputs_copy[train, :], targets_copy[train, :]),
+        validationDataset=(inputs_copy[validation, :], targets_copy[validation, :]),
         testDataset=(inputs_copy[test, :], targets_copy[test, :]), maxEpochs=3))
 
-    println("\n",trainClassANN([2], (inputs_copy[train, :], targets_copy[train, :]), 
-        validationDataset=(inputs_copy[validation, :], targets_copy[validation, :]), 
+    println("\n", trainClassANN([2], (inputs_copy[train, :], targets_copy[train, :]),
+        validationDataset=(inputs_copy[validation, :], targets_copy[validation, :]),
         testDataset=(inputs_copy[test, :], targets_copy[test, :]), transferFunctions=[relu, relu, relu], maxEpochs=8))
 
     println("\nTesting with validation and test datasets with one output")
@@ -239,8 +239,8 @@ function test_trainClassANN()
     Pval = 0.2
     Ptest = 0.1
     train, validation, test = holdOut(N, Pval, Ptest)
-    println("\n",trainClassANN([2, 2, 2], (inputs_copy[train, :], test_targets[train]), 
-        validationDataset=(inputs_copy[validation, :], targets_copy[validation]), 
+    println("\n", trainClassANN([2, 2, 2], (inputs_copy[train, :], test_targets[train]),
+        validationDataset=(inputs_copy[validation, :], targets_copy[validation]),
         testDataset=(inputs_copy[test, :], targets_copy[test]), maxEpochs=6))
 end
 
@@ -252,12 +252,12 @@ function test_holdOut()
     Ptest = 0.1
 
     train, test = holdOut(N, Ptrain)
-    println("\nHold out with ", N, " samples and ", Ptrain*100,"% for training")
+    println("\nHold out with ", N, " samples and ", Ptrain * 100, "% for training")
     println("Train: ", train)
     println("Test: ", test)
 
     train, validation, test = holdOut(N, Pval, Ptest)
-    println("\nHold out with ", N," samples with ", Pval*100, "% for validation and ", Ptest*100 ,"% for testing")
+    println("\nHold out with ", N, " samples with ", Pval * 100, "% for validation and ", Ptest * 100, "% for testing")
     println("Train: ", train)
     println("Validation: ", validation)
     println("Test: ", test)
@@ -266,18 +266,18 @@ end
 # BOLETIN 04
 
 function test_confusionMatrix()
-    outputs =      [true, false, true, true, false, true, false, false, true, true, true]
-    outputs_real = [0.8,  0.1,   0.9,  0.7,  0.2,  0.6,  0.1,  0.2,  0.8,  0.9,  0.7]
-    targets =      [true, false, true, true, false, true, true, true, false, false, false]
+    outputs = [true, false, true, true, false, true, false, false, true, true, true]
+    outputs_real = [0.8, 0.1, 0.9, 0.7, 0.2, 0.6, 0.1, 0.2, 0.8, 0.9, 0.7]
+    targets = [true, false, true, true, false, true, true, true, false, false, false]
     threshold = 0.5
 
     println("Metrics for binary classification")
     printConfusionMatrix(outputs, targets)
     printConfusionMatrix(outputs_real, targets, threshold=threshold)
 
-    outputs =      [false true false; true false false; false false true; true false false; true false false; false false true]
-    outputs_real = [0.2  0.7 0.1;     0.8  0.3 0.1;     0.2  0.3 0.9;     0.7  0.3 0.1;   0.7  0.3 0.1;    0.2  0.3 0.9]
-    targets =      [false true false; true false false; false false true; true false false; false true false; true false false]
+    outputs = [false true false; true false false; false false true; true false false; true false false; false false true]
+    outputs_real = [0.2 0.7 0.1; 0.8 0.3 0.1; 0.2 0.3 0.9; 0.7 0.3 0.1; 0.7 0.3 0.1; 0.2 0.3 0.9]
+    targets = [false true false; true false false; false false true; true false false; false true false; true false false]
     println("Metrics for multiclass classification")
     printConfusionMatrix(outputs, targets)
     printConfusionMatrix(outputs_real, targets, weighted=false)
@@ -286,21 +286,21 @@ end
 # BOLETÍN 05
 function test_crossvalidation()
 
-    testCategories = ["red", "blue", "red", "green", "red", "green", "red", "blue", "green", "green", "blue", "blue"];
-    testCategories2 = ["red", "blue", "red", "red", "blue", "blue", "blue", "red", "blue", "blue", "red", "red", "blue", "red", "blue"];
-    
+    testCategories = ["red", "blue", "red", "green", "red", "green", "red", "blue", "green", "green", "blue", "blue"]
+    testCategories2 = ["red", "blue", "red", "red", "blue", "blue", "blue", "red", "blue", "blue", "red", "red", "blue", "red", "blue"]
 
-    println(crossvalidation(testCategories, 4));
-    println(crossvalidation(testCategories2, 4));
+
+    println(crossvalidation(testCategories, 4))
+    println(crossvalidation(testCategories2, 4))
 end
 
 function test_ANNCrossvalidation()
 
-    norm_inputs = normalizeMinMax(inputs);
+    norm_inputs = normalizeMinMax(inputs)
 
-    indicesCrossValidation = crossvalidation(output, 4);
+    indicesCrossValidation = crossvalidation(output, 4)
 
-    println(ANNCrossValidation([5], norm_inputs, output, indicesCrossValidation, maxEpochs = 5));
+    println(ANNCrossValidation([5], norm_inputs, output, indicesCrossValidation, maxEpochs=5))
 end
 
 
@@ -318,7 +318,7 @@ function test_modelCrossValidation()
     output_codified = oneHotEncoding(output)
     crossValidation = crossvalidation(output_codified, 5)
 
-    (acc, errorRate, sensibility, specificity, precision, 
+    (acc, errorRate, sensibility, specificity, precision,
         negativePredictiveValues, f1, matrix) = modelCrossValidation(:DecissionTreeClassifier, parameters, inputs, output, crossValidation)
 
     println("Metrics for ANN")
@@ -331,5 +331,5 @@ function test_modelCrossValidation()
     println("F1: ", f1)
     println("Confusion matrix: ")
     _print_matrix(matrix)
-    
+
 end
