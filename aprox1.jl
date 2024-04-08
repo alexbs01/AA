@@ -5,7 +5,7 @@ include("metrics.jl")
 
 # Generara una semilla aleatoria
 
-Random.seed!(123)
+Random.seed!(88008)
 
 # Cargar datos y Extraer las características de esa aproximación 
 
