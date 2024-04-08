@@ -48,7 +48,7 @@ function crossvalidation(targets::AbstractArray{Bool,2}, k::Int)
         class = targets[:, numClass];
         numElems = sum(class);
 
-        @assert (numElems > k) "El número de elementos de cada clase debe ser mayor que k";
+        @assert (numElems >= k) "El número de elementos de cada clase debe ser mayor que k";
 
         groups = crossvalidation(numElems, k);
 
@@ -65,7 +65,7 @@ function crossvalidation(targets::AbstractArray{<:Any,1}, k::Int)
     @assert (length(classes) > 1) "Es necesario un mínimo de dos clases"
 
     if length(classes) == 2
-        return crossvalidation(targets==classes[1], k);
+        return crossvalidation((targets .== classes[1]), k);
     else    
         
         return crossvalidation(oneHotEncoding(targets), k);
@@ -85,97 +85,80 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         numClassifiers = 1
     end
     
-    precisiones = zeros(2, numClassifiers, numFolds);
-    tasasError = zeros(2, numClassifiers, numFolds);
-    sensibilidades = zeros(2, numClassifiers, numFolds);
-    especificidades = zeros(2, numClassifiers, numFolds);
-    VPPs = zeros(2, numClassifiers, numFolds);
-    VPNs = zeros(2, numClassifiers, numFolds);
-    F1s = zeros(2, numClassifiers, numFolds);
-    
+
+    # -------------------REVISAR--------------------------
+    precisiones = zeros(numFolds, numClassifiers);
+    tasasError = zeros(numFolds, numClassifiers);
+    sensibilidades = zeros(numFolds, numClassifiers);
+    especificidades = zeros(numFolds, numClassifiers);
+    VPPs = zeros(numFolds, numClassifiers);
+    VPNs = zeros(numFolds, numClassifiers);
+    F1s = zeros(numFolds, numClassifiers);
+    #-----------------------------------------------------
+
     targets = oneHotEncoding(targets);
 
     for fold in 1:numFolds
         testIndexes = findall(crossValidationIndices .== fold)  #Para cada fold, se usan los elementos correspondientes como conjunto de test
         trainIndexes = findall(crossValidationIndices .!= fold) #El resto será el conjunto de entrenamiento
         
-        trainInputs = inputs[trainIndexes]
-        trainTargets = targets[trainIndexes]
-        testInputs = inputs[testIndexes]
-        testTargets =  targets[testIndexes]
+        trainInputs = inputs[trainIndexes, :]
+        trainTargets = targets[trainIndexes, :]
+        testInputs = inputs[testIndexes, :]
+        testTargets =  targets[testIndexes, :]
 
-        if(validationRatio != 0)
-            trainSize = length(trainInputs);
-            validationRatio = validationRatio * trainSize/(length(crossValidationIndices))
-            trainIndexes, valIndexes = holdOut(trainSize, validationRatio)
 
-            trainTargets = trainTargets[trainIndexes]
-            validationTargets = validationTargets[trainIndexes]
-        end
 
-        precisionesFold = zeros(2, numClassifiers, numExecutions);
-        tasasErrorFold = zeros(2, numClassifiers, numExecutions);
-        sensibilidadesFold = zeros(2, numClassifiers, numExecutions);
-        especificidadesFold = zeros(2, numClassifiers, numExecutions);
-        VPPsFold = zeros(2, numClassifiers, numExecutions);
-        VPNsFold = zeros(2, numClassifiers, numExecutions);
-        F1sFold = zeros(2, numClassifiers, numExecutions);
+        precisionesFold = zeros(numExecutions, numClassifiers);
+        tasasErrorFold = zeros(numExecutions, numClassifiers);
+        sensibilidadesFold = zeros(numExecutions, numClassifiers);
+        especificidadesFold = zeros(numExecutions, numClassifiers);
+        VPPsFold = zeros(numExecutions, numClassifiers);
+        VPNsFold = zeros(numExecutions, numClassifiers);
+        F1sFold = zeros(numExecutions, numClassifiers);
 
         for exec in 1:numExecutions
-            #llamar a trainClassAnn y evaluarla con confusionMatrix
-            (bestAnn, trainingLosses, validationLosses, testLosses) = trainClassANN(topology, (trainInputs, trainOutputs), (validationInputs, validationOutputs), (testInputs, testOutputs), 
-            transferFunctions, maxEpochs, minLoss, learningRate, maxEpochsVal)
+
+            #Si validationratio es mayor que 0, 
+            if(validationRatio > 0)
+                trainSize = length(trainIndexes);
+                validationRatio = validationRatio * trainSize/(length(crossValidationIndices))
+                trainIndexes, valIndexes = holdOut(trainSize, validationRatio)
+
+                validationInputs = trainInputs[valIndexes, :]
+                trainInputs = trainInputs[trainIndexes, :]
+
+                validationTargets = trainTargets[valIndexes, :]
+                trainTargets = trainTargets[trainIndexes, :]
+
+                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs, trainTargets), 
+                validationDataset=(validationInputs, validationTargets),
+                testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs, 
+                maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss = minLoss)
+            
+            else
+                #llamar a trainClassAnn y evaluarla con confusionMatrix
+                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs, trainTargets),
+                testDataset = (testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs, 
+                maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss = minLoss)
+            end
             outputs = bestAnn(testInputs)
 
             (precisionesFold[exec], tasasErrorFold[exec], sensibilidadesFold[exec], especificidadesFold[exec], VPPsFold[exec],
             VPNsFold[exec], F1sFold[exec], _) = confusionMatrix(outputs, targets)
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
-        precisiones[fold] = mean(precisionesFold)
-        tasasError[fold] = mean(tasasErrorFold)
-        sensibilidades[fold] = mean(sensibilidadesFold)
-        especificidades[fold] = mean(especificidadesFold)
-        VPPs[fold] = mean(VPPsFold)
-        VPNs[fold] = mean(VPNsFold)
-        F1s[fold] = mean(F1sFold)
+        precisiones[fold] .= mean(precisionesFold, dims = 1)
+        tasasError[fold] .= mean(tasasErrorFold, dims = 1)
+        sensibilidades[fold] .= mean(sensibilidadesFold, dims = 1)
+        especificidades[fold] .= mean(especificidadesFold, dims = 1)
+        VPPs[fold] .= mean(VPPsFold, dims = 1)
+        VPNs[fold] .= mean(VPNsFold, dims = 1)
+        F1s[fold] .= mean(F1sFold, dims = 1)
     end
-    return (mean(precisiones, std(precisiones))), (mean(tasasError, std(tasasError))), (mean(sensibilidades), std(sensibilidades)),
-     (mean(especificidades), std(especificidades)), (mean(VPPs), std(VPPs)), (mean(VPNs), std(VPNs)), (mean(F1s), std(F1s))
+    return (mean(precisiones, dims = 1), std(precisiones, dims = 1)), (mean(tasasError, dims = 1), std(tasasError, dims = 1)),
+    (mean(sensibilidades, dims = 1), std(sensibilidades, dims = 1)),(mean(especificidades, dims = 1), std(especificidades, dims = 1)),
+    (mean(VPPs, dims = 1), std(VPPs, dims = 1)), (mean(VPNs, dims = 1), std(VPNs, dims = 1)), (mean(F1s, dims = 1), std(F1s, dims = 1))
     end
 
 end
-
-#PRUEBAS
-
-import .CrossValidation: crossvalidation
-
-bools = [
-    true false false false;
-    false false true false;
-    false true false false;
-    true false false false;
-    false false false true;
-    false true false false;
-    false false false true;
-    false false true false;
-    true false false false;
-    false false true false;
-    false true false false;
-    true false false false;
-    false false false true;
-    false true false false;
-    false false false true;
-    false false true false;
-    true false false false;
-    false false true false;
-    false true false false;
-    true false false false;
-    false false false true;
-    false true false false;
-    false false false true;
-    false false true false
-]
-
-sol = (crossvalidation(bools, 4));
-println(typeof(sol))
-print(sol);
