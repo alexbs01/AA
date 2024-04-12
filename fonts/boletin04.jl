@@ -2,7 +2,7 @@ module Metrics
 
 export confusionMatrix, printConfusionMatrix
     include("boletin02.jl")
-    import .ANNUtils: oneHotEncoding
+    import .ANNUtils: oneHotEncoding, classifyOutputs
 
     # Auxiliar functions
     function _accuracy(confusionMatrix::AbstractArray{Int64,2})
@@ -37,10 +37,16 @@ export confusionMatrix, printConfusionMatrix
     end
 
     function _sensitivity(confusionMatrix::AbstractArray{Int64,2})
+        if(confusionMatrix[2,1] == 0 && confusionMatrix[2,2] == 0)
+            return 1;
+        end
         return confusionMatrix[2,2] / (confusionMatrix[2,1] + confusionMatrix[2,2])
     end
 
     function _specificity(confusionMatrix::AbstractArray{Int64,2})
+        if(confusionMatrix[1,1] == 0 && confusionMatrix[1, 2] == 0)
+            return 1;
+        end
         return confusionMatrix[1,1] / (confusionMatrix[1,2] + confusionMatrix[1,1])
     end
 
@@ -49,8 +55,10 @@ export confusionMatrix, printConfusionMatrix
     end
 
     function _negativePredictiveValue(confusionMatrix::AbstractArray{Int64,2})
-        return confusionMatrix[1,1] / (confusionMatrix[1,1] + confusionMatrix[2,1])
-        
+        if(confusionMatrix[2,1] == 0 && confusionMatrix[1,1] == 0)
+            return 1;
+        end
+        return confusionMatrix[1,1] / (confusionMatrix[1,1] + confusionMatrix[2,1])   
     end
 
     function _f1Score(confusionMatrix::AbstractArray{Int64,2})
@@ -153,6 +161,9 @@ export confusionMatrix, printConfusionMatrix
     function confusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{Bool,2};
         weighted::Bool=true)
 
+        println("Outputs cl: ",  outputs);
+
+
         #@assert all([in(output, unique(targets)) for output in outputs]) "The outputs must be in the targets"
         @assert size(outputs, 2) == size(targets, 2) "The size of the outputs and targets must be the same"
         @assert size(outputs, 2) != 2 "The output and target must have more than two features. Outputs: $(size(outputs, 2)) Targets: $(size(targets, 2))"
@@ -204,13 +215,17 @@ export confusionMatrix, printConfusionMatrix
         
         finalSensitivity, finalSpecificity, finalPrecision, finalNegativePredictiveValue, finalF1Score ./ numSamples
 
+        println(accuracy, " ", errorRate, " ", finalSensitivity, " ", finalSpecificity, " ",
+         finalPrecision, " ", finalNegativePredictiveValue, " ", finalF1Score)
+    
         return (accuracy, errorRate, finalSensitivity, finalSpecificity, finalPrecision, finalNegativePredictiveValue, finalF1Score, matrix)
     end
 
     function confusionMatrix(outputs::AbstractArray{<:Real,2}, targets::AbstractArray{Bool,2};
         weighted::Bool=true)
 
-        return confusionMatrix(outputs .> 0.5, targets, weighted=weighted)
+        outputs = (classifyOutputs(outputs));
+        return confusionMatrix(outputs, targets, weighted=weighted)
     end
 
 

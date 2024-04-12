@@ -300,7 +300,7 @@ function test_ANNCrossvalidation()
 
     indicesCrossValidation = crossvalidation(output, 4)
 
-    println(ANNCrossValidation([5], norm_inputs, output, indicesCrossValidation, maxEpochs=5))
+    println(ANNCrossValidation([2], norm_inputs, output, indicesCrossValidation, maxEpochs=1000))
 end
 
 
@@ -319,7 +319,7 @@ function test_modelCrossValidation()
     crossValidation = crossvalidation(output_codified, 5)
 
     (acc, errorRate, sensibility, specificity, precision,
-        negativePredictiveValues, f1, matrix) = modelCrossValidation(:DecissionTreeClassifier, parameters, inputs, output, crossValidation)
+        negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, crossValidation)
 
     println("Metrics for ANN")
     println("Accuracy: ", acc)

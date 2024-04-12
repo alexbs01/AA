@@ -87,13 +87,13 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
 
 
     # -------------------REVISAR--------------------------
-    precisiones = zeros(numFolds, numClassifiers)
-    tasasError = zeros(numFolds, numClassifiers)
-    sensibilidades = zeros(numFolds, numClassifiers)
-    especificidades = zeros(numFolds, numClassifiers)
-    VPPs = zeros(numFolds, numClassifiers)
-    VPNs = zeros(numFolds, numClassifiers)
-    F1s = zeros(numFolds, numClassifiers)
+    accuracy = zeros(numFolds)
+    errorRate = zeros(numFolds)
+    recall = zeros(numFolds)
+    specificity = zeros(numFolds)
+    precision = zeros(numFolds)
+    negativePredictiveValue = zeros(numFolds)
+    F1s = zeros(numFolds)
     #-----------------------------------------------------
 
     targets = oneHotEncoding(targets)
@@ -109,13 +109,13 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
 
 
 
-        precisionesFold = zeros(numExecutions, numClassifiers)
-        tasasErrorFold = zeros(numExecutions, numClassifiers)
-        sensibilidadesFold = zeros(numExecutions, numClassifiers)
-        especificidadesFold = zeros(numExecutions, numClassifiers)
-        VPPsFold = zeros(numExecutions, numClassifiers)
-        VPNsFold = zeros(numExecutions, numClassifiers)
-        F1sFold = zeros(numExecutions, numClassifiers)
+        foldAccuracy = zeros(numExecutions)
+        foldErrorRate = zeros(numExecutions)
+        foldRecall = zeros(numExecutions)
+        foldSpecificity = zeros(numExecutions)
+        foldPrecision = zeros(numExecutions)
+        foldNPV = zeros(numExecutions)
+        foldF1s = zeros(numExecutions)
 
         for exec in 1:numExecutions
 
@@ -142,23 +142,25 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
             end
-            outputs = bestAnn(testInputs')
+            outputs = collect(bestAnn(testInputs'))
+            println("Outputs ini: ",  outputs);
 
-            (precisionesFold[exec], tasasErrorFold[exec], sensibilidadesFold[exec], especificidadesFold[exec], VPPsFold[exec],
-                VPNsFold[exec], F1sFold[exec], _) = confusionMatrix(outputs, testTargets')
+
+            (foldAccuracy[exec], foldErrorRate[exec], foldRecall[exec], foldSpecificity[exec], foldPrecision[exec],
+                foldNPV[exec], foldF1s[exec], _) = confusionMatrix(outputs', testTargets)
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
-        precisiones[fold, :] = mean(precisionesFold, dims=1)
-        tasasError[fold, :] = mean(tasasErrorFold, dims=1)
-        sensibilidades[fold, :] = mean(sensibilidadesFold, dims=1)
-        especificidades[fold, :] = mean(especificidadesFold, dims=1)
-        VPPs[fold, :] = mean(VPPsFold, dims=1)
-        VPNs[fold, :] = mean(VPNsFold, dims=1)
-        F1s[fold, :] = mean(F1sFold, dims=1)
+        accuracy[fold] = mean(foldAccuracy)
+        errorRate[fold] = mean(foldErrorRate)
+        recall[fold] = mean(foldRecall)
+        specificity[fold] = mean(foldSpecificity)
+        precision[fold] = mean(foldPrecision)
+        negativePredictiveValue[fold] = mean(foldNPV)
+        F1s[fold] = mean(foldF1s)
     end
-    return (mean(precisiones, dims=1), std(precisiones, dims=1)), (mean(tasasError, dims=1), std(tasasError, dims=1)),
-    (mean(sensibilidades, dims=1), std(sensibilidades, dims=1)), (mean(especificidades, dims=1), std(especificidades, dims=1)),
-    (mean(VPPs, dims=1), std(VPPs, dims=1)), (mean(VPNs, dims=1), std(VPNs, dims=1)), (mean(F1s, dims=1), std(F1s, dims=1))
+    return (mean(accuracy, dims=1), std(accuracy, dims=1)), (mean(errorRate, dims=1), std(errorRate, dims=1)),
+    (mean(recall, dims=1), std(recall, dims=1)), (mean(specificity, dims=1), std(specificity, dims=1)),
+    (mean(precision, dims=1), std(precision, dims=1)), (mean(negativePredictiveValue, dims=1), std(negativePredictiveValue, dims=1)), (mean(F1s, dims=1), std(F1s, dims=1))
 end
 
 end
