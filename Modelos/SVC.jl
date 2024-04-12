@@ -19,12 +19,14 @@ import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 include("../metrics.jl")
 
-inTr = load("VH-VL.jld2", "inTr")
-inVl = load("VH-VL.jld2", "inVl")
-inTs = load("VH-VL.jld2", "inTs")
-trTr = load("VH-VL.jld2", "trTr")
-trVl = load("VH-VL.jld2", "trVl")
-trTs = load("VH-VL.jld2", "trTs")
+file = "VH-VL.jld2"
+
+inTr = load(file, "inTr")
+inVl = load(file, "inVl")
+inTs = load(file, "inTs")
+trTr = load(file, "trTr")
+trVl = load(file, "trVl")
+trTs = load(file, "trTs")
 
 
 trTr = vec(trTr)
