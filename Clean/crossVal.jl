@@ -1,62 +1,64 @@
-using Random
-
 module CrossValidation
-    export crossvalidation, ANNCrossValidation
+export crossvalidation
 
-    function crossvalidation(N::Int64, k::Int)
-        auxVector = 1:k
+using Random
+include("utils.jl")
+import .Utils: oneHotEncoding
 
-        repeats = Int64(ceil(N / k))
-        fullVector = repeat(auxVector, outer=repeats)
-        fullVector = fullVector[1:N]
+function crossvalidation(N::Int64, k::Int)
+  auxVector = 1:k
 
-        shuffle!(fullVector)
+  repeats = Int64(ceil(N / k))
+  fullVector = repeat(auxVector, outer=repeats)
+  fullVector = fullVector[1:N]
 
-        return fullVector
-    end
+  shuffle!(fullVector)
 
-    function crossvalidation(targets::AbstractArray{Bool,1}, k::Int)
-        indexes = zeros(Int64, size(targets, 1))
+  return fullVector
+end
 
-        posInstances = findall(targets)
-        posGroups = crossvalidation(size(posInstances, 1), k)
-        indexes[posInstances] .= posGroups
+function crossvalidation(targets::AbstractArray{Bool,1}, k::Int)
+  indexes = zeros(Int64, size(targets, 1))
 
-        negInstances = findall(.~targets)
-        negGroups = crossvalidation(size(negInstances, 1), k)
-        indexes[negInstances] .= negGroups
+  posInstances = findall(targets)
+  posGroups = crossvalidation(size(posInstances, 1), k)
+  indexes[posInstances] .= posGroups
 
-        return indexes
-    end
+  negInstances = findall(.~targets)
+  negGroups = crossvalidation(size(negInstances, 1), k)
+  indexes[negInstances] .= negGroups
 
-    function crossvalidation(targets::AbstractArray{Bool,2}, k::Int)
-        indexes = zeros(Int64, size(targets, 1))
-        for numClass = 1:size(targets, 2)
-            class = targets[:, numClass]
-            numElems = sum(class)
+  return indexes
+end
 
-            @assert (numElems >= k) "El número de elementos de cada clase debe ser mayor que k"
+function crossvalidation(targets::AbstractArray{Bool,2}, k::Int)
+  indexes = zeros(Int64, size(targets, 1))
+  for numClass = 1:size(targets, 2)
+    class = targets[:, numClass]
+    numElems = sum(class)
 
-            groups = crossvalidation(numElems, k)
+    @assert (numElems >= k) "El número de elementos de cada clase debe ser mayor que k"
 
-            instances = findall(class)
-            indexes[instances] .= groups
-        end
+    groups = crossvalidation(numElems, k)
 
-        return indexes
-    end
+    instances = findall(class)
+    indexes[instances] .= groups
+  end
 
-    function crossvalidation(targets::AbstractArray{<:Any,1}, k::Int)
-        classes = unique(targets)
+  return indexes
+end
 
-        @assert (length(classes) > 1) "Es necesario un mínimo de dos clases"
+function crossvalidation(targets::AbstractArray{<:Any,1}, k::Int)
+  classes = unique(targets)
 
-        if length(classes) == 2
-            return crossvalidation((targets .== classes[1]), k)
-        else
+  @assert (length(classes) > 1) "Es necesario un mínimo de dos clases"
 
-            return crossvalidation(oneHotEncoding(targets), k)
-        end
-    end  
+  if length(classes) == 2
+    return crossvalidation((targets .== classes[1]), k)
+  else
+
+    return crossvalidation(oneHotEncoding(targets), k)
+  end
+end
 
 end
