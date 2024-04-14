@@ -312,23 +312,24 @@ function test_set_modelHyperparameters()
 end
 
 function test_modelCrossValidation()
-    parameters = set_modelHyperparameters(topology=[2, 2], maxEpochs=10, C=1.0)
+    parameters = set_modelHyperparameters(topology=[2, 2], maxEpochs=200, C=1.0)
 
     println(parameters)
     output_codified = oneHotEncoding(output)
     crossValidation = crossvalidation(output_codified, 5)
 
-    (acc, errorRate, sensibility, specificity, precision,
-        negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, crossValidation)
+    (acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd, specificity, specificityStd, precision, precisionStd,
+    negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, crossValidation)
 
     println("Metrics for ANN")
-    println("Accuracy: ", acc)
-    println("Error rate: ", errorRate)
-    println("Sensibility: ", sensibility)
-    println("Specificity: ", specificity)
-    println("Precision: ", precision)
-    println("Negative predictive values: ", negativePredictiveValues)
-    println("F1: ", f1)
+    println("         \tMean\t\tStd")
+    println("Accuracy:\t", acc, "\t\t", accStd)
+    println("Error rate:\t", errorRate, "\t\t", errorRateStd)
+    println("Sensibility:\t", sensibility, "\t\t", sensibilityStd)
+    println("Specificity:\t", specificity, "\t\t", specificityStd)
+    println("Precision:\t", precision, "\t\t", precisionStd)
+    println("Negative predictive values:\t", negativePredictiveValues, "\t\t", negativePredictiveValuesStd)
+    println("F1:\t", f1, "\t\t", f1Std)
     println("Confusion matrix: ")
     _print_matrix(matrix)
 
