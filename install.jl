@@ -1,0 +1,10 @@
+using Pkg
+Pkg.add("Random")
+Pkg.add("JLD2")
+Pkg.add("Flux")
+Pkg.add("Plots")
+Pkg.add("Images")
+Pkg.add("Statistics")
+Pkg.add("DelimitedFiles")
+Pkg.add("FileIO")
+Pkg.add("ScikitLearn")
