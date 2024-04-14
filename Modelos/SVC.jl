@@ -42,7 +42,7 @@ kernels = ["linear", "poly", "rbf", "sigmoid"]
 # SVC
 for kernel in kernels
     if kernel == "linear"
-        for c in [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+        for c in [0.5, 10.0]
             parameters = set_modelHyperparameters(kernel=kernel, C=c)
 
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
@@ -56,11 +56,9 @@ for kernel in kernels
                 negativePredictiveValues, f1, matrix)
         end
     elseif kernel == "poly"
-        for params in [(1.0, 1, 0.8, 1.5),
+        for params in [
             (2.0, 2, 0.1, 2.5),
-            (2.0, 3, 0.4, 1.5),
-            (2.0, 4, 1.2, 1.5),
-            (2.0, 3, 1.5, 1.5)]
+            (2.0, 4, 1.2, 1.5)]
             (c, degree, gamma, coef0) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, degree=degree, gamma=gamma, coef0=coef0)
 
@@ -78,11 +76,9 @@ for kernel in kernels
                 negativePredictiveValues, f1, matrix)
         end
     elseif kernel == "rbf"
-        for params in [(1.0, 1.0),
-            (2.0, 0.7),
-            (3.0, 0.3),
-            (2.0, 0.1),
-            (3.5, 0.5)]
+        for params in [
+            (2.0, 0.9),
+            (3.5, 0.2)]
             (c, gamma) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, gamma=gamma)
 
@@ -98,11 +94,9 @@ for kernel in kernels
                 negativePredictiveValues, f1, matrix)
         end
     elseif kernel == "sigmoid"
-        for params in [(1.0, 1.3, 1.0),
-            (1.5, 0.5, 3.5),
+        for params in [
             (2.0, 1.3, 7.5),
-            (1.2, 0.2, 8.0),
-            (1.5, 0.7, 1.5)]
+            (1.5, 0.7, 8.5)]
             (c, gamma, coef0) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, gamma=gamma, coef0=coef0)
 

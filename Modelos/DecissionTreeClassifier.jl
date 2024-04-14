@@ -18,7 +18,7 @@ import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 include("../metrics.jl")
 
-file = "VH-VL.jld2"
+file = "H-L.jld2"
 
 inTr = load(file, "inTr")
 inVl = load(file, "inVl")
