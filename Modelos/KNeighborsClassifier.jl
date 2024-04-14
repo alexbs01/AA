@@ -31,7 +31,7 @@ crossValidation = crossvalidation(tr, 5)
 
 
 # KNeighborsClassifier
-for n_neighbors in [3, 5, 7, 9, 11]
+for n_neighbors in [2, 4, 6, 8, 16, 24]
     parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
 
     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,

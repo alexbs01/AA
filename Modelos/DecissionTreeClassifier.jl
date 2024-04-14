@@ -31,7 +31,7 @@ crossValidation = crossvalidation(tr, 5)
 
 
 # DecissionTreeClassifier
-for max_depth in [3, 6, 12, 18, 24]
+for max_depth in [4]
     parameters = set_modelHyperparameters(max_depth=max_depth)
 
     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
