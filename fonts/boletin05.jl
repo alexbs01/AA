@@ -81,10 +81,6 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
 
     numClassifiers = length(unique(targets))
 
-    if numClassifiers == 2
-        numClassifiers = 1
-    end
-
     targets = oneHotEncoding(targets)
 
     # -------------------REVISAR--------------------------
@@ -95,7 +91,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     precision = zeros(numFolds)
     negativePredictiveValue = zeros(numFolds)
     F1s = zeros(numFolds)
-    matrixes =zeros(size(targets, 2), size(targets, 2), numExecutions)
+    matrixes =zeros(numClassifiers, numClassifiers, numExecutions)
     #-----------------------------------------------------
 
 
@@ -108,8 +104,6 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         testInputs = inputs[testIndexes, :]
         testTargets = targets[testIndexes, :]
 
-
-
         foldAccuracy = zeros(numExecutions)
         foldErrorRate = zeros(numExecutions)
         foldRecall = zeros(numExecutions)
@@ -117,7 +111,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         foldPrecision = zeros(numExecutions)
         foldNPV = zeros(numExecutions)
         foldF1s = zeros(numExecutions)
-        foldMatrix = zeros(size(targets, 2), size(targets, 2), numExecutions)
+        foldMatrix = zeros(numClassifiers, numClassifiers, numExecutions)
 
         for exec in 1:numExecutions
 
@@ -144,12 +138,18 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
             end
-            outputs = collect(bestAnn(testInputs'))
-            println("Outputs ini: ",  outputs);
 
+            outputs = collect(bestAnn(testInputs')')
+
+            if numClassifiers == 2
+                outputs = vec(outputs)
+                testTargets2 = vec(testTargets)
+            else
+                testTargets2 = testTargets
+            end
 
             (foldAccuracy[exec], foldErrorRate[exec], foldRecall[exec], foldSpecificity[exec], foldPrecision[exec],
-                foldNPV[exec], foldF1s[exec], foldMatrix[:, :, exec]) = confusionMatrix(outputs', testTargets)
+                foldNPV[exec], foldF1s[exec], foldMatrix[:, :, exec]) = confusionMatrix(outputs, testTargets2)
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
         accuracy[fold] = mean(foldAccuracy)

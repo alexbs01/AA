@@ -27,6 +27,10 @@ dataset = readdlm("fonts/iris/iris.data", ',');
 inputs = Float32.(dataset[:, 1:4]);
 output = dataset[:, end];
 
+inputs2 = inputs[1:100, :]
+outputs2 = output[1:100]
+
+
 function _print_matrix(matrix)
     rows, cols = size(matrix)
     for i in 1:rows
@@ -315,8 +319,7 @@ function test_modelCrossValidation()
     parameters = set_modelHyperparameters(topology=[2, 2], maxEpochs=200, C=1.0)
 
     println(parameters)
-    output_codified = oneHotEncoding(output)
-    crossValidation = crossvalidation(output_codified, 5)
+    crossValidation = crossvalidation(output, 5)
 
     (acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd, specificity, specificityStd, precision, precisionStd,
     negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, crossValidation)
