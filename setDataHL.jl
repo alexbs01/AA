@@ -165,9 +165,6 @@ input = Float32.(input)
 
 targt = data[:, 7]
 
-println(size(targt))
-println(size(input))
-
 save("H-L.jld2",
   "in", normalizeMinMax(input, Normalization),
   "tr", targt)
