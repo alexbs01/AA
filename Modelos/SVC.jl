@@ -45,14 +45,15 @@ for kernel in kernels
         for c in [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
             parameters = set_modelHyperparameters(kernel=kernel, C=c)
 
-            (acc, errorRate, sensibility, specificity, precision,
+            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
                 negativePredictiveValues, f1,
                 matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
             println("\tC: ", c)
-            _show_metrics(acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
+            _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                negativePredictiveValues, f1, matrix)
         end
     elseif kernel == "poly"
         for params in [(1.0, 1, 0.8, 1.5),
@@ -63,9 +64,8 @@ for kernel in kernels
             (c, degree, gamma, coef0) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, degree=degree, gamma=gamma, coef0=coef0)
 
-            (acc, errorRate, sensibility, specificity, precision,
-                negativePredictiveValues, f1,
-                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                negativePredictiveValues, f1, matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
@@ -73,7 +73,8 @@ for kernel in kernels
             println("\tDegree: ", degree)
             println("\tGamma: ", gamma)
             println("\tCoef0: ", coef0)
-            _show_metrics(acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
+            _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                negativePredictiveValues, f1, matrix)
         end
     elseif kernel == "rbf"
         for params in [(1.0, 1.0),
@@ -84,15 +85,15 @@ for kernel in kernels
             (c, gamma) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, gamma=gamma)
 
-            (acc, errorRate, sensibility, specificity, precision,
-                negativePredictiveValues, f1,
-                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+            negativePredictiveValues, f1, matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
             println("\tC: ", c)
             println("\tGamma: ", gamma)
-            _show_metrics(acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
+            _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                negativePredictiveValues, f1, matrix)
         end
     elseif kernel == "sigmoid"
         for params in [(1.0, 1.3, 1.0),
@@ -103,16 +104,16 @@ for kernel in kernels
             (c, gamma, coef0) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, gamma=gamma, coef0=coef0)
 
-            (acc, errorRate, sensibility, specificity, precision,
-                negativePredictiveValues, f1,
-                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+            negativePredictiveValues, f1, matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
             println("\tC: ", c)
             println("\tGamma: ", gamma)
             println("\tCoef0: ", coef0)
-            _show_metrics(acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
+            _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                negativePredictiveValues, f1, matrix)
         end
     end
 end

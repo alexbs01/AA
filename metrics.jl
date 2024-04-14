@@ -61,20 +61,6 @@ function calculateMetrics()
 end
 
 
-
-function _show_metrics(acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
-  println("Accuracy: ", acc)
-  println("Error rate: ", errorRate)
-  println("Sensibility: ", sensibility)
-  println("Specificity: ", specificity)
-  println("Precision: ", precision)
-  println("Negative predictive values: ", negativePredictiveValues)
-  println("F1: ", f1)
-  println("Confusion matrix: ")
-  _print_matrix(matrix)
-end
-
-
 function _print_matrix(matrix)
   rows, cols = size(matrix)
   for i in 1:rows
@@ -84,4 +70,20 @@ function _print_matrix(matrix)
     println()
   end
 end
+
+function _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision, negativePredictiveValues, f1, matrix)
+  println("Accuracy: ", acc)
+  println("Error rate: ", errorRate)
+  println("Sensibility: ", sensibility)
+  println("Standard deviation of sensibility: ", stdSensibility)
+  println("Specificity: ", specificity)
+  println("Precision: ", precision)
+  println("Standard deviation of precision: ", stdPrecision)
+  println("Negative predictive values: ", negativePredictiveValues)
+  println("F1: ", f1)
+  println("Confusion matrix: ")
+  _print_matrix(matrix)
+end
+
+
 

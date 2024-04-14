@@ -38,12 +38,12 @@ crossValidation = crossvalidation(trTr, 5)
 for n_neighbors in [3, 5, 7, 9, 11]
     parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
 
-    (acc, errorRate, sensibility, specificity, precision,
-        negativePredictiveValues, f1,
-        matrix) = modelCrossValidation(:KNeighborsClassifier, parameters, inTr, trTr, crossValidation)
+    (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+            negativePredictiveValues, f1, matrix) = modelCrossValidation(:KNeighborsClassifier, parameters, inTr, trTr, crossValidation)
 
     println("\nMetrics for KNeighborsClassifier")
     println("Parameters:")
     println("\tn_neighbors: ", n_neighbors)
-    _show_metrics(acc, errorRate, sensibility, specificity, precision, negativePredictiveValues, f1, matrix)
+    _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+        negativePredictiveValues, f1, matrix)
 end
