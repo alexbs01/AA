@@ -211,7 +211,6 @@ export oneHotEncoding, calculateMinMaxNormalizationParameters, calculateZeroMean
 
         numEpoch = 0
         numEpochVal = 0
-        println("Epoch ", numEpoch, ": loss: ", trainingLoss)
 
         bestAnn = deepcopy(ann)
 
