@@ -136,18 +136,18 @@ function imageLoader(folder::String, type::Float64)
   return imagArr
 end
 
-VHtr = imageLoader("../dataset/train/Very_High/", 1)
-VHva = imageLoader("../dataset/val/Very_High/", 1)
+VHtr = imageLoader("dataset/train/Very_High/", 1.0)
+VHva = imageLoader("dataset/val/Very_High/", 1.0)
 println("VH finished")
-VLtr = imageLoader("../dataset/train/Very_Low/", 0)
-VLva = imageLoader("../dataset/val/Very_Low/", 0)
+VLtr = imageLoader("dataset/train/Very_Low/", 0.0)
+VLva = imageLoader("dataset/val/Very_Low/", 0.0)
 println("VL finished")
 
-Htr = imageLoader("../dataset/train/High/", 0.75)
-Hva = imageLoader("../dataset/val/High/", 0.75)
+Htr = imageLoader("dataset/train/High/", 0.75)
+Hva = imageLoader("dataset/val/High/", 0.75)
 println("H finished")
-Ltr = imageLoader("../dataset/train/Low/", 0.25)
-Lva = imageLoader("../dataset/val/Low/", 0.25)
+Ltr = imageLoader("dataset/train/Low/", 0.25)
+Lva = imageLoader("dataset/val/Low/", 0.25)
 println("L finished")
 
 data = vcat(VHtr, VLtr)
