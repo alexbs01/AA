@@ -121,6 +121,8 @@ export modelCrossValidation, set_modelHyperparameters
             errorRateStd = std(errorRatePerTraining)
             sensibility = mean(sensibilityPerTraining)
             sensibilityStd = std(sensibilityPerTraining)
+            print(sensibilityPerTraining)
+            print(sensibilityStd)
             specificity = mean(specificityPerTraining)
             specificityStd = std(specificityPerTraining)
             precision = mean(precisionPerTraining)
@@ -135,7 +137,7 @@ export modelCrossValidation, set_modelHyperparameters
 
 
         return (acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd, specificity, specificityStd,
-         precision, precisionStd, negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix)
+            precision, precisionStd, negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix)
 
     end
 
