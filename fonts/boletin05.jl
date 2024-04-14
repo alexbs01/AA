@@ -85,6 +85,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         numClassifiers = 1
     end
 
+    targets = oneHotEncoding(targets)
 
     # -------------------REVISAR--------------------------
     accuracy = zeros(numFolds)
@@ -94,9 +95,9 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     precision = zeros(numFolds)
     negativePredictiveValue = zeros(numFolds)
     F1s = zeros(numFolds)
+    matrixes =zeros(size(targets, 2), size(targets, 2), numExecutions)
     #-----------------------------------------------------
 
-    targets = oneHotEncoding(targets)
 
     for fold in 1:numFolds
         testIndexes = findall(crossValidationIndices .== fold)  #Para cada fold, se usan los elementos correspondientes como conjunto de test
@@ -116,6 +117,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         foldPrecision = zeros(numExecutions)
         foldNPV = zeros(numExecutions)
         foldF1s = zeros(numExecutions)
+        foldMatrix = zeros(size(targets, 2), size(targets, 2), numExecutions)
 
         for exec in 1:numExecutions
 
@@ -147,7 +149,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
 
 
             (foldAccuracy[exec], foldErrorRate[exec], foldRecall[exec], foldSpecificity[exec], foldPrecision[exec],
-                foldNPV[exec], foldF1s[exec], _) = confusionMatrix(outputs', testTargets)
+                foldNPV[exec], foldF1s[exec], foldMatrix[:, :, exec]) = confusionMatrix(outputs', testTargets)
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
         accuracy[fold] = mean(foldAccuracy)
@@ -157,10 +159,12 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         precision[fold] = mean(foldPrecision)
         negativePredictiveValue[fold] = mean(foldNPV)
         F1s[fold] = mean(foldF1s)
+        matrixes[:, :, fold] = mean(foldMatrix, dims = 3)
     end
     return (mean(accuracy, dims=1), std(accuracy, dims=1)), (mean(errorRate, dims=1), std(errorRate, dims=1)),
     (mean(recall, dims=1), std(recall, dims=1)), (mean(specificity, dims=1), std(specificity, dims=1)),
-    (mean(precision, dims=1), std(precision, dims=1)), (mean(negativePredictiveValue, dims=1), std(negativePredictiveValue, dims=1)), (mean(F1s, dims=1), std(F1s, dims=1))
+    (mean(precision, dims=1), std(precision, dims=1)), (mean(negativePredictiveValue, dims=1),
+    std(negativePredictiveValue, dims=1)), (mean(F1s, dims=1), std(F1s, dims=1)), mean(matrixes, dims = 3)
 end
 
 end
