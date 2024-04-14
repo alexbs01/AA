@@ -131,11 +131,11 @@ function imageLoader(folder::String, type::Float64)
   return imagArr
 end
 
-VHtr = imageLoader("../dataset/train/Very_High/", 1.0)
-VHva = imageLoader("../dataset/val/Very_High/", 1.0)
+VHtr = imageLoader("dataset/train/Very_High/", 1.0)
+VHva = imageLoader("dataset/val/Very_High/", 1.0)
 println("VH finished")
-VLtr = imageLoader("../dataset/train/Very_Low/", 0.0)
-VLva = imageLoader("../dataset/val/Very_Low/", 0.0)
+VLtr = imageLoader("dataset/train/Very_Low/", 0.0)
+VLva = imageLoader("dataset/val/Very_Low/", 0.0)
 println("VL finished")
 
 data = vcat(VHtr, VLtr)
@@ -167,3 +167,21 @@ save("VH-VL.jld2",
   "trTr", targtTr,
   "trVl", targtVl,
   "trTs", targtTs)
+
+println("Very High Class:")
+
+println("Mean Red Channel: ", mean(VHtr[:, 1]))
+println("Mean Green Channel: ", mean(VHtr[:, 2]))
+println("Mean Blue Channel: ", mean(VHtr[:, 3]))
+println("Std Red Channel: ", std(VHtr[:, 1]))
+println("Std Green Channel: ", std(VHtr[:, 2]))
+println("Std Blue Channel: ", std(VHtr[:, 3]))
+
+println("Very Low Class:")
+
+println("Mean Red Channel: ", mean(VLtr[:, 1]))
+println("Mean Green Channel: ", mean(VLtr[:, 2]))
+println("Mean Blue Channel: ", mean(VLtr[:, 3]))
+println("Std Red Channel: ", std(VLtr[:, 1]))
+println("Std Green Channel: ", std(VLtr[:, 2]))
+println("Std Blue Channel: ", std(VLtr[:, 3]))
