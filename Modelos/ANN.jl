@@ -36,9 +36,10 @@ topologies = [[2], [4], [8], [10], [2 2], [2 4], [4 2], [4 4]]
 for topology in topologies
     parameters = set_modelHyperparameters(topology=topology)
 
-    (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
-        negativePredictiveValues, f1, matrix) = modelCrossValidation(:ANN, parameters, inTr, trTr, crossValidation)
+    (acc, _, errorRate, _, sensibility, sensibilityStd, specificity, _,
+        precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:ANN, parameters, inTr, trTr, crossValidation)
 
+    
     println("\nMetrics for DecisionTreeClassifier")
     println("Parameters:")
     println("\tMax depth: ", max_depth)

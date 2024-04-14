@@ -45,8 +45,8 @@ for kernel in kernels
         for c in [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
             parameters = set_modelHyperparameters(kernel=kernel, C=c)
 
-            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
-                negativePredictiveValues, f1,
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, 
                 matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
@@ -64,8 +64,9 @@ for kernel in kernels
             (c, degree, gamma, coef0) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, degree=degree, gamma=gamma, coef0=coef0)
 
-            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
-                negativePredictiveValues, f1, matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, 
+                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
@@ -85,8 +86,9 @@ for kernel in kernels
             (c, gamma) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, gamma=gamma)
 
-            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
-            negativePredictiveValues, f1, matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, 
+                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
@@ -104,8 +106,9 @@ for kernel in kernels
             (c, gamma, coef0) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, gamma=gamma, coef0=coef0)
 
-            (acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
-            negativePredictiveValues, f1, matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, 
+                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
