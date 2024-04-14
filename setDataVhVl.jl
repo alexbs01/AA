@@ -142,31 +142,17 @@ data = vcat(VHtr, VLtr)
 data = vcat(data, VHva)
 data = vcat(data, VLva)
 
-index = holdOut(size(data, 1), 0.2, 0.2)
-
 Normalization = calculateMinMaxNormalizationParameters(Float32.(data[:, 1:6]))
 
-inputTr = data[index[1], 1:6]
-inputVl = data[index[2], 1:6]
-inputTs = data[index[3], 1:6]
-inputTr = Float32.(inputTr)
-inputVl = Float32.(inputVl)
-inputTs = Float32.(inputTs)
+input = data[:, 1:6]
+input = Float32.(input)
 
-targtTr = data[index[1], 7]
-targtVl = data[index[2], 7]
-targtTs = data[index[3], 7]
-targtTr = oneHotEncoding(targtTr)
-targtVl = oneHotEncoding(targtVl)
-targtTs = oneHotEncoding(targtTs)
+targt = data[:, 7]
+targt = oneHotEncoding(targt)
 
 save("VH-VL.jld2",
-  "inTr", normalizeMinMax(inputTr, Normalization),
-  "inVl", normalizeMinMax(inputVl, Normalization),
-  "inTs", normalizeMinMax(inputTs, Normalization),
-  "trTr", targtTr,
-  "trVl", targtVl,
-  "trTs", targtTs)
+  "in", normalizeMinMax(input, Normalization),
+  "tr", targt)
 
 println("Very High Class:")
 

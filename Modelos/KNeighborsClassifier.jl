@@ -20,16 +20,12 @@ import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 file = "VH-VL.jld2"
 
-inTr = load(file, "inTr")
-inVl = load(file, "inVl")
-inTs = load(file, "inTs")
-trTr = load(file, "trTr")
-trVl = load(file, "trVl")
-trTs = load(file, "trTs")
+in = load(file, "in")
+tr = load(file, "tr")
 
 
-trTr = vec(trTr)
-crossValidation = crossvalidation(trTr, 5)
+tr = vec(tr)
+crossValidation = crossvalidation(tr, 5)
 
 
 
@@ -39,7 +35,7 @@ for n_neighbors in [3, 5, 7, 9, 11]
     parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
 
     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-        precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:KNeighborsClassifier, parameters, inTr, trTr, crossValidation)
+        precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:KNeighborsClassifier, parameters, in, tr, crossValidation)
 
     println("\nMetrics for KNeighborsClassifier")
     println("Parameters:")

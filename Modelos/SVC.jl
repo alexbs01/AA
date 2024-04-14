@@ -21,16 +21,12 @@ include("../metrics.jl")
 
 file = "VH-VL.jld2"
 
-inTr = load(file, "inTr")
-inVl = load(file, "inVl")
-inTs = load(file, "inTs")
-trTr = load(file, "trTr")
-trVl = load(file, "trVl")
-trTs = load(file, "trTs")
+in = load(file, "in")
+trTs = load(file, "tr")
 
 
-trTr = vec(trTr)
-crossValidation = crossvalidation(trTr, 5)
+tr = vec(tr)
+crossValidation = crossvalidation(tr, 5)
 
 
 
@@ -47,7 +43,7 @@ for kernel in kernels
 
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                 precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+                matrix) = modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
@@ -64,7 +60,7 @@ for kernel in kernels
 
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                 precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+                matrix) = modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
@@ -84,7 +80,7 @@ for kernel in kernels
 
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                 precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+                matrix) = modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")
@@ -102,7 +98,7 @@ for kernel in kernels
 
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                 precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                matrix) = modelCrossValidation(:SVC, parameters, inTr, trTr, crossValidation)
+                matrix) = modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
 
             println("\nMetrics for SVC with kernel: ", kernel)
             println("Parameters:")

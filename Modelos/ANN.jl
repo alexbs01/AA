@@ -21,15 +21,11 @@ include("../metrics.jl")
 
 file = "VH-VL.jld2"
 
-inTr = load(file, "inTr")
-inVl = load(file, "inVl")
-inTs = load(file, "inTs")
-trTr = load(file, "trTr")
-trVl = load(file, "trVl")
-trTs = load(file, "trTs")
+in = load(file, "in")
+tr = load(file, "tr")
 
-trTr = vec(trTr)
-crossValidation = crossvalidation(trTr, 5)
+tr = vec(tr)
+crossValidation = crossvalidation(tr, 5)
 
 topologies = [[2], [4], [8], [10], [2 2], [2 4], [4 2], [4 4]]
 # DecissionTreeClassifier
@@ -37,7 +33,7 @@ for topology in topologies
     parameters = set_modelHyperparameters(topology=topology)
 
     (acc, _, errorRate, _, sensibility, sensibilityStd, specificity, _,
-        precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:ANN, parameters, inTr, trTr, crossValidation)
+        precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:ANN, parameters, in, tr, crossValidation)
 
     
     println("\nMetrics for DecisionTreeClassifier")

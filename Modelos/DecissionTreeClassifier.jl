@@ -18,18 +18,14 @@ import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 include("../metrics.jl")
 
-file = "H-L.jld2"
+file = "VH-VL.jld2"
 
-inTr = load(file, "inTr")
-inVl = load(file, "inVl")
-inTs = load(file, "inTs")
-trTr = load(file, "trTr")
-trVl = load(file, "trVl")
-trTs = load(file, "trTs")
+in = load(file, "in")
+tr = load(file, "tr")
 
 
-trTr = vec(trTr)
-crossValidation = crossvalidation(trTr, 5)
+tr = vec(tr)
+crossValidation = crossvalidation(tr, 5)
 
 
 
@@ -39,7 +35,7 @@ for max_depth in [3, 6, 12, 18, 24]
     parameters = set_modelHyperparameters(max_depth=max_depth)
 
     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-        precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:DecissionTreeClassifier, parameters, inTr, trTr, crossValidation)
+        precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation)
 
     println("\nMetrics for DecisionTreeClassifier")
     println("Parameters:")
