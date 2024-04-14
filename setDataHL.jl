@@ -151,10 +151,10 @@ Lva = imageLoader("dataset/val/Low/", 0.25)
 println("L finished")
 
 data = vcat(VHtr, VLtr)
-data = vcat(data, Ltr)
-data = vcat(data, Htr)
 data = vcat(data, VHva)
 data = vcat(data, VLva)
+data = vcat(data, Ltr)
+data = vcat(data, Htr)
 data = vcat(data, Lva)
 data = vcat(data, Hva)
 
@@ -164,7 +164,9 @@ input = data[:, 1:6]
 input = Float32.(input)
 
 targt = data[:, 7]
-targt = oneHotEncoding(targt)
+
+println(size(targt))
+println(size(input))
 
 save("H-L.jld2",
   "in", normalizeMinMax(input, Normalization),
