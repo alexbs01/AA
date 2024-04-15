@@ -49,19 +49,19 @@ export modelCrossValidation, set_modelHyperparameters
             validationRatio = validationRatio, maxEpochsVal = maxEpochsVal)
 
         else
-            numExecutions = modelHyperparameters["numExecutions"]
+            numFolds = maximum(crossValidationIndices)
+            numClasses = length(unique(targets))
 
-            accuracyPerTraining = zeros(numExecutions)
-            errorRatePerTraining = zeros(numExecutions)
-            sensibilityPerTraining = zeros(numExecutions)
-            specificityPerTraining = zeros(numExecutions)
-            precisionPerTraining = zeros(numExecutions)
-            negativePredictiveValuesPerTraining = zeros(numExecutions)
-            f1PerTraining = zeros(numExecutions)
-            confusionMatrixPerTraining = zeros(size(oneHotEncoding(targets), 2), size(oneHotEncoding(targets), 2), numExecutions)
-            confusionMatrixPerTraining = zeros(2, 2, numExecutions)
+            accuracyPerTraining = zeros(numFolds)
+            errorRatePerTraining = zeros(numFolds)
+            sensibilityPerTraining = zeros(numFolds)
+            specificityPerTraining = zeros(numFolds)
+            precisionPerTraining = zeros(numFolds)
+            negativePredictiveValuesPerTraining = zeros(numFolds)
+            f1PerTraining = zeros(numFolds)
+            confusionMatrixPerTraining = zeros(numClasses, numClasses, numFolds)
 
-            for numExecution in 1:numExecutions
+            for numFold in 1:numFolds
 
                 if modelType == :SVC
                     possibleKernel = ["linear", "poly", "rbf", "sigmoid"]
@@ -97,8 +97,8 @@ export modelCrossValidation, set_modelHyperparameters
                     model = KNeighborsClassifier(n_neighbors=n_neighbors)
                 end
 
-                trainIndex = findall(crossValidationIndices .!= 1)
-                testIndex = findall(crossValidationIndices .== 1)
+                trainIndex = findall(crossValidationIndices .!= numFold)
+                testIndex = findall(crossValidationIndices .== numFold)
 
                 trainingInputs = inputs[trainIndex, :]
                 trainingTargets = targets[trainIndex]
@@ -109,10 +109,10 @@ export modelCrossValidation, set_modelHyperparameters
     
                 outputs = predict(model, testingInputs);
     
-                (accuracyPerTraining[numExecution], errorRatePerTraining[numExecution], 
-                    sensibilityPerTraining[numExecution], specificityPerTraining[numExecution], 
-                    precisionPerTraining[numExecution], negativePredictiveValuesPerTraining[numExecution], 
-                    f1PerTraining[numExecution], confusionMatrixPerTraining[:,:,numExecution]) = confusionMatrix(outputs, testingTargets)
+                (accuracyPerTraining[numFold], errorRatePerTraining[numFold], 
+                    sensibilityPerTraining[numFold], specificityPerTraining[numFold], 
+                    precisionPerTraining[numFold], negativePredictiveValuesPerTraining[numFold], 
+                    f1PerTraining[numFold], confusionMatrixPerTraining[:,:,numFold]) = confusionMatrix(outputs, testingTargets)
             end
 
             acc = mean(accuracyPerTraining)
