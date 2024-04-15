@@ -322,7 +322,7 @@ function test_modelCrossValidation()
     crossValidation = crossvalidation(output, 5)
 
     (acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd, specificity, specificityStd, precision, precisionStd,
-    negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix) = modelCrossValidation(:SVC, parameters, inputs, output, crossValidation)
+    negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix) = modelCrossValidation(:ANN, parameters, inputs, output, crossValidation)
 
     println("Metrics for ANN")
     println("         \tMean\t\tStd")
