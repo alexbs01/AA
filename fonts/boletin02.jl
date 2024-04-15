@@ -97,7 +97,6 @@ export oneHotEncoding, calculateMinMaxNormalizationParameters, calculateZeroMean
         end
 
         (_, index) = findmax(outputs, dims=2)
-        println(index)
         out = falses(size(outputs))
         
         return out[index] .= true;
