@@ -14,7 +14,7 @@ export oneHotEncoding, calculateMinMaxNormalizationParameters, calculateZeroMean
         num_patterns = length(feature)
 
         if num_classes == 2
-            encoded_matrix = reshape((==).(feature, classes[1]), :, 1)
+            encoded_matrix = vec(reshape(feature .== classes[1], :, 1))
         else
             encoded_matrix = falses(num_patterns, num_classes)
 

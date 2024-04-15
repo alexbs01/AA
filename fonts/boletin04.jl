@@ -122,7 +122,10 @@ function confusionMatrix(outputs::AbstractArray{Bool,1}, targets::AbstractArray{
 
   return (pre, err, sen, esp, vpp, vpn, f1, conf)
 end
-
+function confusionMatrix(outputs::AbstractArray{<:Real,1},
+  targets::AbstractArray{<:Real,1}; threshold::Real=0.5)
+  return confusionMatrix(broadcast(>=, outputs, threshold), broadcast(>=, targets, threshold))
+end 
 
 function confusionMatrix(outputs::AbstractArray{<:Real,1},
   targets::AbstractArray{Bool,1}; threshold::Real=0.5)
@@ -131,10 +134,9 @@ function confusionMatrix(outputs::AbstractArray{<:Real,1},
 end
 
 # Boletin04_2
-function confusionMatrixx(outputs::AbstractArray{Bool,2}, targets::AbstractArray{Bool,2};
+function confusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{Bool,2};
   weighted::Bool=true)
 
-	println("a")
   #@assert all([in(output, unique(targets)) for output in outputs]) "The outputs must be in the targets"
   @assert size(outputs, 2) == size(targets, 2) "The size of the outputs and targets must be the same"
   @assert size(outputs, 2) != 2 "The output and target must have more than two features. Outputs: $(size(outputs, 2)) Targets: $(size(targets, 2))"
@@ -206,6 +208,17 @@ function confusionMatrix(outputs::AbstractArray{<:Any,1}, targets::AbstractArray
 
   return confusionMatrix(outputs, targets, weighted=weighted)
 end
+
+function confusionMatrix(outputs::AbstractArray{<:Any,1}, targets::AbstractArray{<:Any,1})
+
+  classes = unique(targets)
+  outputs = oneHotEncoding(outputs, classes)
+  targets = oneHotEncoding(targets, classes)
+
+  return confusionMatrix(outputs, targets)
+end
+
+
 
 function printConfusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{Bool,2};
   weighted::Bool=true)

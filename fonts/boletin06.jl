@@ -117,9 +117,8 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         precisionPerTraining[numExecution],
         negativePredictiveValuesPerTraining[numExecution],
         f1PerTraining[numExecution],
-        conf,
+        confusionMatrixPerTraining[:, :, numExecution],
 			) = confusionMatrix(outputs, testingTargets)
-			println(conf)
 
     end
 
