@@ -97,9 +97,9 @@ function generateDataFile(out::String, sources::Array{Tuple{String,Float64}})
   data = Array{Any}(undef, 0, 7)
   for (source, val) in sources
     sorTR = imageLoader("dataset/train/$source/", val)
-    sorVa = imageLoader("dataset/val/$source/", val)
+    #sorVa = imageLoader("dataset/val/$source/", val)
     data = vcat(data, sorTR)
-    data = vcat(data, sorVa)
+    #data = vcat(data, sorVa)
     println(source)
   end
   Normalization = calculateMinMaxNormalizationParameters(Float32.(data[:, 1:6]))
