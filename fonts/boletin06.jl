@@ -72,18 +72,19 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         gamma = modelHyperparameters["gamma"]
         coef0 = modelHyperparameters["coef0"]
         @assert kernel in possibleKernel "Kernel must be linear, poly, rbf or sigmoid"
+        classWeight = "balanced"
 
         if kernel == "linear"
-          model = SVC(kernel=kernel, C=C)
+          model = SVC(kernel=kernel, C=C, class_weight=classWeight)
 
         elseif kernel == "poly"
-          model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0)
+          model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0, class_weight=classWeight)
 
         elseif kernel == "rbf"
-          model = SVC(kernel=kernel, C=C, gamma=gamma)
+          model = SVC(kernel=kernel, C=C, gamma=gamma, class_weight=classWeight)
 
         elseif kernel == "sigmoid"
-          model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
+          model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0, class_weight=classWeight)
 
         end
 

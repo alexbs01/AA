@@ -105,7 +105,6 @@ end
 # Boletin04_1
 # Main functions
 function confusionMatrix(outputs::AbstractArray{Bool,1}, targets::AbstractArray{Bool,1})
-
   VP = count((outputs .+ targets) .== 2)
   VN = count((outputs .+ targets) .== 0)
   FP = count(((outputs .== false) .+ targets) .== 0)

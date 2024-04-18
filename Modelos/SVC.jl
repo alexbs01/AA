@@ -51,7 +51,7 @@ for kernel in kernels
 
         for params in [
             (2.0, 2, 0.1, 2.5),
-            (2.0, 4, 1.2, 1.5)]
+            (2.0, 3, 1.2, 1.5)]
             (c, degree, gamma, coef0) = params
             parameters = set_modelHyperparameters(kernel=kernel, C=c, degree=degree, gamma=gamma, coef0=coef0)
 
