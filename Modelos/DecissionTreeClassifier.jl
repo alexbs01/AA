@@ -18,17 +18,13 @@ import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 include("../metrics.jl")
 
-file = "VH-VL.jld2"
+file = "VH-M-VL.jld2"
 
 in = load(file, "in")
 tr = load(file, "tr")
 
-
 tr = vec(tr)
 crossValidation = crossvalidation(tr, 5)
-
-
-
 
 # DecissionTreeClassifier
 for max_depth in [4, 6, 8, 12, 18, 24]

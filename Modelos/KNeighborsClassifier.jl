@@ -18,7 +18,7 @@ import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 
 
-file = "VH-VL.jld2"
+file = "VH-M-VL.jld2"
 
 in = load(file, "in")
 tr = load(file, "tr")
@@ -26,8 +26,6 @@ tr = load(file, "tr")
 
 tr = vec(tr)
 crossValidation = crossvalidation(tr, 5)
-
-
 
 
 # KNeighborsClassifier

@@ -150,6 +150,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
 
             (foldAccuracy[exec], foldErrorRate[exec], foldRecall[exec], foldSpecificity[exec], foldPrecision[exec],
                 foldNPV[exec], foldF1s[exec], foldMatrix[:, :, exec]) = confusionMatrix(outputs, testTargets2)
+
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
         accuracy[fold] = mean(foldAccuracy)
@@ -160,7 +161,11 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         negativePredictiveValue[fold] = mean(foldNPV)
         F1s[fold] = mean(foldF1s)
         matrixes[:, :, fold] = mean(foldMatrix, dims = 3)
+
+        println("Finished fold: ", fold)
+
     end
+
     return (mean(accuracy, dims=1), std(accuracy, dims=1)), (mean(errorRate, dims=1), std(errorRate, dims=1)),
     (mean(recall, dims=1), std(recall, dims=1)), (mean(specificity, dims=1), std(specificity, dims=1)),
     (mean(precision, dims=1), std(precision, dims=1)), (mean(negativePredictiveValue, dims=1),

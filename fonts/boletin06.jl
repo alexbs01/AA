@@ -19,8 +19,11 @@ using .CrossValidation: ANNCrossValidation
 export modelCrossValidation, set_modelHyperparameters
 
 @sk_import svm:SVC
+@sk_import svm:SVR
 @sk_import tree:DecisionTreeClassifier
+@sk_import tree:DecisionTreeRegressor
 @sk_import neighbors:KNeighborsClassifier
+@sk_import neighbors:KNeighborsRegressor
 
 function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
   inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},
@@ -75,28 +78,49 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         classWeight = "balanced"
 
         if kernel == "linear"
-          model = SVC(kernel=kernel, C=C, class_weight=classWeight)
-
+          if numClasses == 2
+            model = SVC(kernel=kernel, C=C, class_weight=classWeight)
+          else
+            model = SVR(kernel=kernel, C=C)
+          end
         elseif kernel == "poly"
-          model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0, class_weight=classWeight)
-
+          if numClasses == 2
+            model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0, class_weight=classWeight)
+          else
+            model = SVR(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0)
+          end
         elseif kernel == "rbf"
-          model = SVC(kernel=kernel, C=C, gamma=gamma, class_weight=classWeight)
-
+          if numClasses == 2
+            model = SVC(kernel=kernel, C=C, gamma=gamma, class_weight=classWeight)
+          else
+            model = SVR(kernel=kernel, C=C, gamma=gamma)
+          end
         elseif kernel == "sigmoid"
-          model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0, class_weight=classWeight)
-
+          if numClasses == 2
+            model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0, class_weight=classWeight)
+          else
+            model = SVR(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
+          end
         end
 
       elseif modelType == :DecissionTreeClassifier
         max_depth = modelHyperparameters["max_depth"]
 
-        model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
+        if numClasses == 2
+          model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
+        else
+          model = DecisionTreeRegressor(max_depth=max_depth, random_state=1)
+        end
+
 
       elseif modelType == :KNeighborsClassifier
         n_neighbors = modelHyperparameters["n_neighbors"]
 
-        model = KNeighborsClassifier(n_neighbors=n_neighbors)
+        if numClasses == 2
+          model = KNeighborsClassifier(n_neighbors=n_neighbors)
+        else
+          model = KNeighborsRegressor(n_neighbors=n_neighbors)
+        end
       end
 
       trainIndex = findall(crossValidationIndices .!= numFold)
@@ -111,6 +135,12 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
 
       outputs = predict(model, testingInputs)
 
+      if numClasses != 2
+        classes = sort(unique(targets))
+        testingTargets = encoder(testingTargets, classes)
+        outputs = encoder(outputs, classes)
+      end
+
       (
         accuracyPerTraining[numFold],
         errorRatePerTraining[numFold],
@@ -120,7 +150,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         negativePredictiveValuesPerTraining[numFold],
         f1PerTraining[numFold],
         confusionMatrixPerTraining[:, :, numFold],
-			) = confusionMatrix(outputs, testingTargets)
+      ) = confusionMatrix(outputs, testingTargets)
 
     end
 
@@ -185,6 +215,25 @@ function set_modelHyperparameters(; kernel::String="linear", C::Float64=0.0,
   dict["numExecutions"] = numExecutions
 
   return dict
+end
+
+function encoder(vector::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
+  numClasses = length(classes)
+  arrMids = []
+
+  for i in 2:numClasses
+    push!(arrMids, ((classes[i]-classes[i-1])/2)+classes[i-1])
+  end
+
+  encoded = falses(length(vector), numClasses)
+
+  encoded[:,1] .= (<=).(vector, arrMids[1])
+  for i in 2:(numClasses-1)
+    encoded[:,i] .= (==).(((<=).(vector, arrMids[i])),((>).(vector,arrMids[i-1])))
+  end
+  encoded[:,numClasses] .= (>).(vector, arrMids[numClasses-1])
+
+  return encoded
 end
 
 end

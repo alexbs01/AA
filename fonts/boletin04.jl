@@ -16,11 +16,6 @@ function _accuracy(confusionMatrix::AbstractArray{Int64,2})
 
   denominator = sum(confusionMatrix[:, :])
 
-  if denominator <= 0
-    println("DDDDDDDDDDDD")
-    println(denominator)
-  end
-
   return numerator / denominator
 end
 
