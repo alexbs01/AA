@@ -27,7 +27,15 @@ export errorFunction
         mae = meanAbsoluteError(real_values, predicted_values)
         msle = meanSquaredLogarithmicError(real_values, predicted_values)
         rmse = rootMeanSquaredError(real_values, predicted_values)
-
+        
         return (mse, mae, msle, rmse)
+    end
+
+    function showErrorFunctions(real_values::AbstractArray{<:Real,1}, predicted_values::AbstractArray{<:Real,1})
+        mse, mae, msle, rmse = errorFunction(real_values, predicted_values)
+        println("Mean Squared Error: ", mse)
+        println("Mean Absolute Error: ", mae)
+        println("Mean Squared Logarithmic Error: ", msle)
+        println("Root Mean Squared Error: ", rmse)
     end
 end
