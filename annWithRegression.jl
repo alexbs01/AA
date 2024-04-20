@@ -1,4 +1,4 @@
-module ANNUtils
+module ANNUtilsRegression
 
 using Statistics
 using Flux
@@ -352,7 +352,7 @@ function trainRegANN(topology::AbstractArray{<:Int,1},
     @assert size(val_inputs, 1) == size(val_targets, 1) "Val_inputs and val_targets must have the same number of samples"
     @assert size(test_inputs, 1) == size(test_targets, 1) "Test_inputs and test_targets must have the same number of samples"
 
-    ann = buildClassANN(size(train_inputs, 2), topology, 1, transferFunctions=transferFunctions)
+    ann = buildRegANN(size(train_inputs, 2), topology, 1, transferFunctions=transferFunctions)
 
     loss(x, y) = Losses.mse(ann(x), y)
 

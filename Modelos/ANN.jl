@@ -35,7 +35,7 @@ for topology in topologies
     (acc, _, errorRate, _, sensibility, sensibilityStd, specificity, _,
         precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:ANN, parameters, in, tr, crossValidation)
 
-    
+
     println("\nMetrics for ANN")
     println("Parameters:")
     println("\tTopology: ", topology)

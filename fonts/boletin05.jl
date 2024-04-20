@@ -6,7 +6,9 @@ export crossvalidation, ANNCrossValidation
 include("boletin02.jl")
 include("boletin03.jl")
 include("boletin04.jl")
-import .ANNUtils: oneHotEncoding, trainClassANN
+include("../annWithRegression.jl")
+
+import .ANNUtilsRegression: oneHotEncoding, trainRegANN
 import .Overtraining: holdOut
 import .Metrics: confusionMatrix
 
@@ -91,7 +93,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     precision = zeros(numFolds)
     negativePredictiveValue = zeros(numFolds)
     F1s = zeros(numFolds)
-    matrixes =zeros(numClassifiers, numClassifiers, numExecutions)
+    matrixes = zeros(numClassifiers, numClassifiers, numExecutions)
     #-----------------------------------------------------
 
 
@@ -127,14 +129,14 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
                 validationTargets = trainTargets[valIndexes, :]
                 trainTargets = trainTargets[trainIndexes, :]
 
-                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs, trainTargets),
+                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
                     validationDataset=(validationInputs, validationTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
 
             else
                 #llamar a trainClassAnn y evaluarla con confusionMatrix
-                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs, trainTargets),
+                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
             end
@@ -160,7 +162,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         precision[fold] = mean(foldPrecision)
         negativePredictiveValue[fold] = mean(foldNPV)
         F1s[fold] = mean(foldF1s)
-        matrixes[:, :, fold] = mean(foldMatrix, dims = 3)
+        matrixes[:, :, fold] = mean(foldMatrix, dims=3)
 
         println("Finished fold: ", fold)
 
@@ -169,7 +171,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     return (mean(accuracy, dims=1), std(accuracy, dims=1)), (mean(errorRate, dims=1), std(errorRate, dims=1)),
     (mean(recall, dims=1), std(recall, dims=1)), (mean(specificity, dims=1), std(specificity, dims=1)),
     (mean(precision, dims=1), std(precision, dims=1)), (mean(negativePredictiveValue, dims=1),
-    std(negativePredictiveValue, dims=1)), (mean(F1s, dims=1), std(F1s, dims=1)), mean(matrixes, dims = 3)
+        std(negativePredictiveValue, dims=1)), (mean(F1s, dims=1), std(F1s, dims=1)), mean(matrixes, dims=3)
 end
 
 end

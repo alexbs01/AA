@@ -5,13 +5,15 @@ include("boletin03.jl")
 include("boletin04.jl")
 include("boletin05.jl")
 include("../errorFunctions/errorFunctions.jl")
+include("../annWithRegression.jl")
+
 using ScikitLearn
 using ScikitLearn: fit!, predict
 using Flux
 using Flux.Losses
 using Statistics
 using .Metrics: confusionMatrix
-using .ANNUtils: oneHotEncoding, trainClassANN
+using .ANNUtilsRegression: oneHotEncoding, trainRegANN
 using .Overtraining: holdOut
 using .CrossValidation: ANNCrossValidation
 using .ErrorFunctions: errorFunction
