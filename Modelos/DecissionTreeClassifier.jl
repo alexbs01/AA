@@ -34,8 +34,6 @@ for max_depth in [4, 6, 8, 12, 18, 24]
   (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
     precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation)
 
-  (mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation)
-
   println("\nMetrics for DecisionTreeClassifier")
   println("Parameters:")
   println("\tMax depth: ", max_depth)
@@ -43,7 +41,6 @@ for max_depth in [4, 6, 8, 12, 18, 24]
   _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
     negativePredictiveValues, f1, matrix)
   showErrorFunctions(mse, mae, msle, rmse)
-
 
 end
 
