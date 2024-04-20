@@ -2,6 +2,7 @@ module ScikitModels
 
 include("boletin02.jl")
 include("boletin03.jl")
+include("boletin04.jl")
 include("../crossValWithRegression.jl")
 include("boletin05.jl")
 include("../errorFunctions/errorFunctions.jl")
@@ -15,7 +16,7 @@ using Statistics
 using .Metrics: confusionMatrix
 using .ANNUtilsRegression: oneHotEncoding, trainRegANN
 using .Overtraining: holdOut
-using .RegCrossValidation: ANNCrossValidation
+using .RegCrossValidation: regANNCrossValidation
 using .ErrorFunctions: errorFunction
 
 export modelCrossValidation, set_modelHyperparameters
@@ -55,7 +56,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
         validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)"""
 
-        (mse, mseStd), (mae, maeStd), (mlse, mlseStd), (rmse, rmseStd) =
+        (mse, mseStd), (mae, maeStd), (msle, msleStd), (rmse, rmseStd) =
       regANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
         transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
         validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)

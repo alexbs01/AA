@@ -7,10 +7,12 @@ include("fonts/boletin02.jl")
 include("fonts/boletin03.jl")
 include("fonts/boletin04.jl")
 include("annWithRegression.jl")
+include("errorFunctions/errorFunctions.jl")
 
 import .ANNUtilsRegression: oneHotEncoding, trainRegANN
 import .Overtraining: holdOut
 import .Metrics: confusionMatrix
+import .ErrorFunctions: errorFunction
 
 using Random
 using Flux
@@ -184,13 +186,11 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
 
     numClassifiers = length(unique(targets))
 
-
-    targets = oneHotEncoding(targets)
-
+    targets = Float32.(targets)
 
     mse = zeros(numFolds)
     mae = zeros(numFolds)
-    mlse = zeros(numFolds)
+    msle = zeros(numFolds)
     rmse = zeros(numFolds)
 
 
@@ -201,16 +201,18 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
         trainInputs = inputs[trainIndexes, :]
         testInputs = inputs[testIndexes, :]
 
-        trainTargets = targets[trainIndexes, :]
-        testTargets = targets[testIndexes, :]
+        trainTargets = targets[trainIndexes]
+        testTargets = targets[testIndexes]
+        println(typeof(targets))
 
         
         foldMse = zeros(numExecutions)
         foldMae = zeros(numExecutions)
-        foldMlse = zeros(numExecutions)
+        foldMsle = zeros(numExecutions)
         foldRmse = zeros(numExecutions)
 
         for exec in 1:numExecutions
+            println("Iteración ", exec)
 
             #Si validationratio es mayor que 0, 
             if (validationRatio > 0)
@@ -221,9 +223,9 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
                 validationInputs = trainInputs[valIndexes, :]
                 trainInputs = trainInputs[trainIndexes, :]
 
-                validationTargets = trainTargets[valIndexes, :]
-                trainTargets = trainTargets[trainIndexes, :]
-
+                validationTargets = trainTargets[valIndexes]
+                trainTargets = trainTargets[trainIndexes]
+                println(typeof(targets))
                 (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
                     validationDataset=(validationInputs, validationTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
@@ -238,19 +240,21 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
 
             outputs = collect(bestAnn(testInputs')')
 
-            (mse[exec], mae[exec], msle[exec], rmse[exec]) = errorFunction(Float32.(testTargets), outputs)
+            (foldMse[exec], foldMae[exec], foldMsle[exec], foldRmse[exec]) = errorFunction(testTargets, vec(outputs))
 
         end
         #hacer la media de los resultados obtenidos en confusionMatrix
         mse[fold] = mean(foldMse)
         mae[fold] = mean(foldMae)
         rmse[fold] = mean(foldRmse)
-        mlse[fold] = mean(foldMlse)
+        msle[fold] = mean(foldmsle)
 
         println("Finished fold: ", fold)
 
     end
 
     return (mean(mse, dims=1), std(mse, dims=1)), (mean(mae, dims=1), std(mae, dims=1)),
-    (mean(mlse, dims=1), std(mlse, dims=1)), (mean(rmse, dims=1), std(rmse, dims=1))
+    (mean(msle, dims=1), std(msle, dims=1)), (mean(rmse, dims=1), std(rmse, dims=1))
+end
+
 end

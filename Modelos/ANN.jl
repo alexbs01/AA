@@ -7,8 +7,8 @@ using DelimitedFiles;
 using Flux;
 using Flux.Losses;
 
-include("../fonts/boletin04.jl")
-include("../fonts/boletin05.jl")
+include("../fonts/boletin04.jl");
+include("../fonts/boletin05.jl");
 include("../fonts/boletin06.jl");
 
 import .Metrics: confusionMatrix;

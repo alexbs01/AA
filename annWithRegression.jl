@@ -282,9 +282,9 @@ function trainClassANN(topology::AbstractArray{<:Int,1},
 end
 
 function trainClassANN(topology::AbstractArray{<:Int,1},
-    trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Real,1}};
-    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0)),
-    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0)),
+    trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}};
+    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0)),
+    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0)),
     transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),
     maxEpochs::Int=1000,
     minLoss::Real=0.0,
@@ -335,9 +335,9 @@ function buildRegANN(numInputs::Int, topology::AbstractArray{<:Int,1}, numOutput
 end
 
 function trainRegANN(topology::AbstractArray{<:Int,1},
-    trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,1}};
-    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
-    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
+    trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}};
+    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
+    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
     transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),
     maxEpochs::Int=1000,
     minLoss::Real=0.0,
@@ -412,6 +412,28 @@ function trainRegANN(topology::AbstractArray{<:Int,1},
 
     return (bestAnn, trainingLosses, validationLosses, testLosses)
 
+end
+
+function trainRegANN(topology::AbstractArray{<:Int,1},
+    trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,2}};
+    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,2}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
+    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,2}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
+    transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),
+    maxEpochs::Int=1000,
+    minLoss::Real=0.0,
+    learningRate::Real=0.01,
+    maxEpochsVal::Int=20)
+
+    (train_inputs, train_targets) = trainingDataset
+    (val_inputs, val_targets) = validationDataset
+    (test_inputs, test_targets) = testDataset
+
+    print(size(train_targets))
+    @assert size(train_targets, 2) == 1 "train_targets must ve a 1 dimensional array"
+
+    return trainRegANN(topology, (train_inputs, vec(train_targets)), validationDataset=(val_inputs, vec(val_targets)),
+     testDataset=(test_inputs, vec(test_targets)), transferFunctions=transferFunctions, maxEpochs=maxEpochs,
+     minLoss=minLoss, learningRate=learningRate, maxEpochsVal=maxEpochsVal)
 
 end
 
