@@ -1,7 +1,7 @@
 module RegCrossValidation
 
 
-export crossvalidation, ANNCrossValidation
+export crossvalidation, ANNCrossValidation, regANNCrossValidation
 
 include("fonts/boletin02.jl")
 include("fonts/boletin03.jl")
@@ -83,11 +83,9 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
 
     numClassifiers = length(unique(targets))
 
-    if(classification)
-        targets = oneHotEncoding(targets)
-    end
 
-    # -------------------REVISAR--------------------------
+    targets = oneHotEncoding(targets)
+
     accuracy = zeros(numFolds)
     errorRate = zeros(numFolds)
     recall = zeros(numFolds)
@@ -96,17 +94,17 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
     negativePredictiveValue = zeros(numFolds)
     F1s = zeros(numFolds)
     matrixes = zeros(numClassifiers, numClassifiers, numExecutions)
-    #-----------------------------------------------------
-
 
     for fold in 1:numFolds
         testIndexes = findall(crossValidationIndices .== fold)  #Para cada fold, se usan los elementos correspondientes como conjunto de test
         trainIndexes = findall(crossValidationIndices .!= fold) #El resto será el conjunto de entrenamiento
 
         trainInputs = inputs[trainIndexes, :]
-        trainTargets = targets[trainIndexes, :]
         testInputs = inputs[testIndexes, :]
+
+        trainTargets = targets[trainIndexes, :]
         testTargets = targets[testIndexes, :]
+
 
         foldAccuracy = zeros(numExecutions)
         foldErrorRate = zeros(numExecutions)
@@ -116,6 +114,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         foldNPV = zeros(numExecutions)
         foldF1s = zeros(numExecutions)
         foldMatrix = zeros(numClassifiers, numClassifiers, numExecutions)
+
 
         for exec in 1:numExecutions
 
@@ -131,14 +130,14 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
                 validationTargets = trainTargets[valIndexes, :]
                 trainTargets = trainTargets[trainIndexes, :]
 
-                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
+                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs, trainTargets),
                     validationDataset=(validationInputs, validationTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
 
             else
                 #llamar a trainClassAnn y evaluarla con confusionMatrix
-                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
+                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs, trainTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
             end
@@ -176,4 +175,82 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         std(negativePredictiveValue, dims=1)), (mean(F1s, dims=1), std(F1s, dims=1)), mean(matrixes, dims=3)
 end
 
+function regANNCrossValidation(topology::AbstractArray{<:Int,1},
+    inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1}, crossValidationIndices::Array{Int64,1}; numExecutions::Int=50,
+    transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)), maxEpochs::Int=1000, minLoss::Real=0.0,
+    learningRate::Real=0.01, validationRatio::Real=0, maxEpochsVal::Int=20)
+
+    numFolds = maximum(crossValidationIndices)
+
+    numClassifiers = length(unique(targets))
+
+
+    targets = oneHotEncoding(targets)
+
+
+    mse = zeros(numFolds)
+    mae = zeros(numFolds)
+    mlse = zeros(numFolds)
+    rmse = zeros(numFolds)
+
+
+    for fold in 1:numFolds
+        testIndexes = findall(crossValidationIndices .== fold)  #Para cada fold, se usan los elementos correspondientes como conjunto de test
+        trainIndexes = findall(crossValidationIndices .!= fold) #El resto será el conjunto de entrenamiento
+
+        trainInputs = inputs[trainIndexes, :]
+        testInputs = inputs[testIndexes, :]
+
+        trainTargets = targets[trainIndexes, :]
+        testTargets = targets[testIndexes, :]
+
+        
+        foldMse = zeros(numExecutions)
+        foldMae = zeros(numExecutions)
+        foldMlse = zeros(numExecutions)
+        foldRmse = zeros(numExecutions)
+
+        for exec in 1:numExecutions
+
+            #Si validationratio es mayor que 0, 
+            if (validationRatio > 0)
+                trainSize = length(trainIndexes)
+                validationRatio = validationRatio * trainSize / (length(crossValidationIndices))
+                trainIndexes, valIndexes = holdOut(trainSize, validationRatio)
+
+                validationInputs = trainInputs[valIndexes, :]
+                trainInputs = trainInputs[trainIndexes, :]
+
+                validationTargets = trainTargets[valIndexes, :]
+                trainTargets = trainTargets[trainIndexes, :]
+
+                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
+                    validationDataset=(validationInputs, validationTargets),
+                    testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
+                    maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
+
+            else
+                #llamar a trainClassAnn y evaluarla con confusionMatrix
+                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
+                    testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
+                    maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
+            end
+
+            outputs = collect(bestAnn(testInputs')')
+
+            (mse[exec], mae[exec], msle[exec], rmse[exec]) = errorFunction(Float32.(testTargets), outputs)
+
+        end
+        #hacer la media de los resultados obtenidos en confusionMatrix
+        mse[fold] = mean(foldMse)
+        mae[fold] = mean(foldMae)
+        rmse[fold] = mean(foldRmse)
+        mlse[fold] = mean(foldMlse)
+
+        println("Finished fold: ", fold)
+
+    end
+
+    return (mean(mse, dims=1), std(mse, dims=1)), (mean(mae, dims=1), std(mae, dims=1)),
+    (mean(mlse, dims=1), std(mlse, dims=1)), (mean(rmse, dims=1), std(rmse, dims=1))
 end

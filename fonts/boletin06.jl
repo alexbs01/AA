@@ -2,7 +2,7 @@ module ScikitModels
 
 include("boletin02.jl")
 include("boletin03.jl")
-include("boletin04.jl")
+include("../crossValWithRegression.jl")
 include("boletin05.jl")
 include("../errorFunctions/errorFunctions.jl")
 include("../annWithRegression.jl")
@@ -15,7 +15,7 @@ using Statistics
 using .Metrics: confusionMatrix
 using .ANNUtilsRegression: oneHotEncoding, trainRegANN
 using .Overtraining: holdOut
-using .CrossValidation: ANNCrossValidation
+using .RegCrossValidation: ANNCrossValidation
 using .ErrorFunctions: errorFunction
 
 export modelCrossValidation, set_modelHyperparameters
@@ -55,11 +55,12 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
         validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)"""
 
-        (acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
-    (precision, precisionStd), (negativePredictiveValues, negativePredictiveValuesStd), (f1, f1Std), matrix =
-      ANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
+        (mse, mseStd), (mae, maeStd), (mlse, mlseStd), (rmse, rmseStd) =
+      regANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
         transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
-        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal, classification = false)
+        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)
+
+        return (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd)
 
   else
 
