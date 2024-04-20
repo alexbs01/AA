@@ -6,6 +6,7 @@ include("boletin02.jl")
 include("boletin03.jl")
 include("boletin04.jl")
 include("boletin05.jl")
+include("../errorFunctions/errorFunctions.jl")
 using ScikitLearn
 using ScikitLearn: fit!, predict
 using Flux
@@ -15,6 +16,7 @@ using .Metrics: confusionMatrix
 using .ANNUtils: oneHotEncoding, trainClassANN
 using .Overtraining: holdOut
 using .CrossValidation: ANNCrossValidation
+using .ErrorFunctions: errorFunction
 
 export modelCrossValidation, set_modelHyperparameters
 
@@ -55,6 +57,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
 
     numFolds = maximum(crossValidationIndices)
     numClasses = length(unique(targets))
+    cls = true
 
     accuracyPerTraining = zeros(numFolds)
     errorRatePerTraining = zeros(numFolds)
@@ -64,6 +67,11 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
     negativePredictiveValuesPerTraining = zeros(numFolds)
     f1PerTraining = zeros(numFolds)
     confusionMatrixPerTraining = zeros(numClasses, numClasses, numFolds)
+
+    mse = zeros(numFolds)
+    mae = zeros(numFolds)
+    msle = zeros(numFolds)
+    rmse = zeros(numFolds)
 
     for numFold in 1:numFolds
 
@@ -135,22 +143,33 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
 
       outputs = predict(model, testingInputs)
 
-      if numClasses != 2
-        classes = sort(unique(targets))
-        testingTargets = encoder(testingTargets, classes)
-        outputs = encoder(outputs, classes)
-      end
+      if unique(outputs) == numClasses
+        (
+          accuracyPerTraining[numFold],
+          errorRatePerTraining[numFold],
+          sensibilityPerTraining[numFold],
+          specificityPerTraining[numFold],
+          precisionPerTraining[numFold],
+          negativePredictiveValuesPerTraining[numFold],
+          f1PerTraining[numFold],
+          confusionMatrixPerTraining[:, :, numFold],
+        ) = confusionMatrix(outputs, testingTargets)
+      else
+				println("a")
+        cls = false
+        (mse[numFold], mae[numFold], msle[numFold], rmse[numFold]) = errorFunction(testingTargets, outputs)
 
-      (
-        accuracyPerTraining[numFold],
-        errorRatePerTraining[numFold],
-        sensibilityPerTraining[numFold],
-        specificityPerTraining[numFold],
-        precisionPerTraining[numFold],
-        negativePredictiveValuesPerTraining[numFold],
-        f1PerTraining[numFold],
-        confusionMatrixPerTraining[:, :, numFold],
-      ) = confusionMatrix(outputs, testingTargets)
+        (
+          accuracyPerTraining[numFold],
+          errorRatePerTraining[numFold],
+          sensibilityPerTraining[numFold],
+          specificityPerTraining[numFold],
+          precisionPerTraining[numFold],
+          negativePredictiveValuesPerTraining[numFold],
+          f1PerTraining[numFold],
+          confusionMatrixPerTraining[:, :, numFold],
+        ) = confusionMatrix(encoder(outputs, sort(unique(testingTargets))), testingTargets)
+      end
 
     end
 
@@ -170,6 +189,19 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
     f1Std = std(f1PerTraining)
     matrix = mean(confusionMatrixPerTraining, dims=3)
 
+    if !cls
+      mse = mean(mse)
+      mseDes = std(mse)
+      mae = mean(mae)
+      maeDes = std(mae)
+      msle = mean(msle)
+      msleDes = std(msle)
+      rmse = mean(rmse)
+      rmseDes = std(rmse)
+
+      return (acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd, specificity, specificityStd,
+        precision, precisionStd, negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix, mse, mseDes, mae, maeDes, msle, msleDes, rmse, rmseDes)
+    end
   end
 
 
@@ -217,21 +249,26 @@ function set_modelHyperparameters(; kernel::String="linear", C::Float64=0.0,
   return dict
 end
 
+function trunc(out::AbstractArray{<:Real,1}, maxi::Float32, mini::Float32)
+  map!(x -> x > maxi ? maxi : x, out)
+  map!(x -> x < mini ? mini : x, out)
+end
+
 function encoder(vector::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
   numClasses = length(classes)
   arrMids = []
 
   for i in 2:numClasses
-    push!(arrMids, ((classes[i]-classes[i-1])/2)+classes[i-1])
+    push!(arrMids, ((classes[i] - classes[i-1]) / 2) + classes[i-1])
   end
 
   encoded = falses(length(vector), numClasses)
 
-  encoded[:,1] .= (<=).(vector, arrMids[1])
+  encoded[:, 1] .= (<=).(vector, arrMids[1])
   for i in 2:(numClasses-1)
-    encoded[:,i] .= (==).(((<=).(vector, arrMids[i])),((>).(vector,arrMids[i-1])))
+    encoded[:, i] .= (==).(((<=).(vector, arrMids[i])), ((>).(vector, arrMids[i-1])))
   end
-  encoded[:,numClasses] .= (>).(vector, arrMids[numClasses-1])
+  encoded[:, numClasses] .= (>).(vector, arrMids[numClasses-1])
 
   return encoded
 end
