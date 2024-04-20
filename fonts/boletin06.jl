@@ -1,6 +1,4 @@
 module ScikitModels
-using Pkg
-"""Pkg.add("Statistics")"""
 
 include("boletin02.jl")
 include("boletin03.jl")
@@ -155,20 +153,8 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
           confusionMatrixPerTraining[:, :, numFold],
         ) = confusionMatrix(outputs, testingTargets)
       else
-				println("a")
         cls = false
-        (mse[numFold], mae[numFold], msle[numFold], rmse[numFold]) = errorFunction(testingTargets, outputs)
-
-        (
-          accuracyPerTraining[numFold],
-          errorRatePerTraining[numFold],
-          sensibilityPerTraining[numFold],
-          specificityPerTraining[numFold],
-          precisionPerTraining[numFold],
-          negativePredictiveValuesPerTraining[numFold],
-          f1PerTraining[numFold],
-          confusionMatrixPerTraining[:, :, numFold],
-        ) = confusionMatrix(encoder(outputs, sort(unique(testingTargets))), testingTargets)
+        (mse[numFold], mae[numFold], msle[numFold], rmse[numFold]) = errorFunction(Float32.(testingTargets), outputs)
       end
 
     end
@@ -199,8 +185,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       rmse = mean(rmse)
       rmseDes = std(rmse)
 
-      return (acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd, specificity, specificityStd,
-        precision, precisionStd, negativePredictiveValues, negativePredictiveValuesStd, f1, f1Std, matrix, mse, mseDes, mae, maeDes, msle, msleDes, rmse, rmseDes)
+      return (mse, mseDes, mae, maeDes, msle, msleDes, rmse, rmseDes)
     end
   end
 
@@ -247,30 +232,6 @@ function set_modelHyperparameters(; kernel::String="linear", C::Float64=0.0,
   dict["numExecutions"] = numExecutions
 
   return dict
-end
-
-function trunc(out::AbstractArray{<:Real,1}, maxi::Float32, mini::Float32)
-  map!(x -> x > maxi ? maxi : x, out)
-  map!(x -> x < mini ? mini : x, out)
-end
-
-function encoder(vector::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
-  numClasses = length(classes)
-  arrMids = []
-
-  for i in 2:numClasses
-    push!(arrMids, ((classes[i] - classes[i-1]) / 2) + classes[i-1])
-  end
-
-  encoded = falses(length(vector), numClasses)
-
-  encoded[:, 1] .= (<=).(vector, arrMids[1])
-  for i in 2:(numClasses-1)
-    encoded[:, i] .= (==).(((<=).(vector, arrMids[i])), ((>).(vector, arrMids[i-1])))
-  end
-  encoded[:, numClasses] .= (>).(vector, arrMids[numClasses-1])
-
-  return encoded
 end
 
 end
