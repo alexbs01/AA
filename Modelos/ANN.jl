@@ -32,14 +32,30 @@ topologies = [[2], [4], [8], [10], [2, 2], [2, 4], [4, 2], [4, 4]]
 for topology in topologies
     parameters = set_modelHyperparameters(topology=topology, numExecutions=20)
 
-    (acc, _, errorRate, _, sensibility, sensibilityStd, specificity, _,
-        precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:ANN, parameters, in, tr, crossValidation)
-
+    """(acc, _, errorRate, _, sensibility, sensibilityStd, specificity, _,
+        precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) =
+         modelCrossValidation(:ANN, parameters, in, tr, crossValidation)
 
     println("\nMetrics for ANN")
     println("Parameters:")
     println("\tTopology: ", topology)
     _show_metrics(acc, errorRate, sensibility, sensibilityStd, specificity, precision, precisionStd,
-        negativePredictiveValues, f1, matrix)
+        negativePredictiveValues, f1, matrix)"""
+
+
+    (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd) =
+     modelCrossValidation(:ANN, parameters, in, tr, crossValidation)
+
+    println("\nMetrics for ANN")
+    println("Parameters:")
+    println("\tTopology: ", topology)
+    println("mse: ", mse)
+    println("mse (std): ", mseStd)
+    println("mae: ", mae)
+    println("mae (std): ", maeStd)
+    println("msle: ", msle)
+    println("msle (std): ", msleStd)
+    println("rmse: ", rmse)
+    println("rmse (std): ", rmseStd)
 end
 
