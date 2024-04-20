@@ -335,9 +335,9 @@ function buildRegANN(numInputs::Int, topology::AbstractArray{<:Int,1}, numOutput
 end
 
 function trainRegANN(topology::AbstractArray{<:Int,1},
-    trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,2}};
-    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,2}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
-    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,2}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
+    trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,1}};
+    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
+    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{Bool,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
     transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),
     maxEpochs::Int=1000,
     minLoss::Real=0.0,
@@ -352,7 +352,7 @@ function trainRegANN(topology::AbstractArray{<:Int,1},
     @assert size(val_inputs, 1) == size(val_targets, 1) "Val_inputs and val_targets must have the same number of samples"
     @assert size(test_inputs, 1) == size(test_targets, 1) "Test_inputs and test_targets must have the same number of samples"
 
-    ann = buildRegANN(size(train_inputs, 2), topology, 1, transferFunctions=transferFunctions)
+    ann = buildClassANN(size(train_inputs, 2), topology, 1, transferFunctions=transferFunctions)
 
     loss(x, y) = Losses.mse(ann(x), y)
 

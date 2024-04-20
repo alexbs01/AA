@@ -31,6 +31,8 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
   inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},
   crossValidationIndices::Array{Int64,1})
 
+  cls = true
+
   @assert size(inputs, 1) == size(targets, 1) "Inputs and targets must have the same number of samples"
   @assert (modelType == :SVC) ||
           (modelType == :DecissionTreeClassifier) ||
@@ -47,17 +49,22 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
     minLoss = modelHyperparameters["minLoss"]
     numExecutions = modelHyperparameters["numExecutions"]
 
-    (acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
+    """(acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
     (precision, precisionStd), (negativePredictiveValues, negativePredictiveValuesStd), (f1, f1Std), matrix =
       ANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
         transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
-        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)
+        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)"""
+
+        (acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
+    (precision, precisionStd), (negativePredictiveValues, negativePredictiveValuesStd), (f1, f1Std), matrix =
+      ANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
+        transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
+        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal, classification = false)
 
   else
 
     numFolds = maximum(crossValidationIndices)
     numClasses = length(unique(targets))
-    cls = true
 
     accuracyPerTraining = zeros(numFolds)
     errorRatePerTraining = zeros(numFolds)
