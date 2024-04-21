@@ -150,24 +150,4 @@ input = Float32.(input)
 targt = data[:, 7]
 targt = oneHotEncoding(targt)
 
-save("VH-VL.jld2",
-  "in", normalizeMinMax(input, Normalization),
-  "tr", targt)
-
-println("Very High Class:")
-
-println("Mean Red Channel: ", mean(VHtr[:, 1]))
-println("Mean Green Channel: ", mean(VHtr[:, 2]))
-println("Mean Blue Channel: ", mean(VHtr[:, 3]))
-println("Std Red Channel: ", std(VHtr[:, 1]))
-println("Std Green Channel: ", std(VHtr[:, 2]))
-println("Std Blue Channel: ", std(VHtr[:, 3]))
-
-println("Very Low Class:")
-
-println("Mean Red Channel: ", mean(VLtr[:, 1]))
-println("Mean Green Channel: ", mean(VLtr[:, 2]))
-println("Mean Blue Channel: ", mean(VLtr[:, 3]))
-println("Std Red Channel: ", std(VLtr[:, 1]))
-println("Std Green Channel: ", std(VLtr[:, 2]))
-println("Std Blue Channel: ", std(VLtr[:, 3]))
+println(VHtr)
