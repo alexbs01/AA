@@ -200,7 +200,7 @@ function trainClassANN(topology::AbstractArray{<:Int,1},
 
     ann = buildClassANN(size(train_inputs, 2), topology, size(train_targets, 2), transferFunctions=transferFunctions)
 
-    loss(x, y) = (size(y, 1) == 1) ? Losses.binarycrossentropy(ann(x), y) : Losses.crossentropy(ann(x), y)
+    loss(x, y) = (size(y, 1) == 1) ? Losses.binary_focal_loss(ann(x), y) : Losses.focal_loss(ann(x), y)
 
     trainingLosses = Float32[]
     validationLosses = Float32[]
