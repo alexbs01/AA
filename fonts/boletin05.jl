@@ -8,7 +8,7 @@ include("boletin03.jl")
 include("boletin04.jl")
 include("../annWithRegression.jl")
 
-import .ANNUtilsRegression: oneHotEncoding, trainRegANN
+import .ANNUtilsRegression: oneHotEncoding, trainClassANN, trainRegANN
 import .Overtraining: holdOut
 import .Metrics: confusionMatrix
 

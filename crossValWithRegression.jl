@@ -9,7 +9,7 @@ include("fonts/boletin04.jl")
 include("annWithRegression.jl")
 include("errorFunctions/errorFunctions.jl")
 
-import .ANNUtilsRegression: oneHotEncoding, trainRegANN
+import .ANNUtilsRegression: oneHotEncoding, trainRegANN, trainClassANN
 import .Overtraining: holdOut
 import .Metrics: confusionMatrix
 import .ErrorFunctions: errorFunction
@@ -166,8 +166,6 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         negativePredictiveValue[fold] = mean(foldNPV)
         F1s[fold] = mean(foldF1s)
         matrixes[:, :, fold] = mean(foldMatrix, dims=3)
-
-        println("Finished fold: ", fold)
 
     end
 

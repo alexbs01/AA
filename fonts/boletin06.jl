@@ -16,7 +16,7 @@ using Statistics
 using .Metrics: confusionMatrix
 using .ANNUtilsRegression: oneHotEncoding, trainRegANN
 using .Overtraining: holdOut
-using .RegCrossValidation: regANNCrossValidation
+using .RegCrossValidation: regANNCrossValidation, ANNCrossValidation
 using .ErrorFunctions: errorFunction
 
 export modelCrossValidation, set_modelHyperparameters
@@ -30,7 +30,7 @@ export modelCrossValidation, set_modelHyperparameters
 
 function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
   inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},
-  crossValidationIndices::Array{Int64,1})
+  crossValidationIndices::Array{Int64,1}, doRegression::Bool=false)
 
   cls = true
 
@@ -50,18 +50,21 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
     minLoss = modelHyperparameters["minLoss"]
     numExecutions = modelHyperparameters["numExecutions"]
 
-    """(acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
-    (precision, precisionStd), (negativePredictiveValues, negativePredictiveValuesStd), (f1, f1Std), matrix =
-      ANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
-        transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
-        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)"""
 
-        (mse, mseStd), (mae, maeStd), (msle, msleStd), (rmse, rmseStd) =
+    if(doRegression)
+      (mse, mseStd), (mae, maeStd), (msle, msleStd), (rmse, rmseStd) =
       regANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
         transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
         validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)
 
         return (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd)
+    end
+    
+    (acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
+    (precision, precisionStd), (negativePredictiveValues, negativePredictiveValuesStd), (f1, f1Std), matrix =
+      ANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
+        transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
+        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)
 
   else
 
@@ -95,25 +98,25 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         classWeight = "balanced"
 
         if kernel == "linear"
-          if numClasses == 0
+          if !doRegression
             model = SVC(kernel=kernel, C=C, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C)
           end
         elseif kernel == "poly"
-          if numClasses == 0
+          if !doRegression
             model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0)
           end
         elseif kernel == "rbf"
-          if numClasses == 0
+          if !doRegression
             model = SVC(kernel=kernel, C=C, gamma=gamma, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C, gamma=gamma)
           end
         elseif kernel == "sigmoid"
-          if numClasses == 0
+          if !doRegression
             model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
@@ -123,7 +126,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       elseif modelType == :DecissionTreeClassifier
         max_depth = modelHyperparameters["max_depth"]
 
-        if numClasses == 1
+        if !doRegression
           model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
         else
           model = DecisionTreeRegressor(max_depth=max_depth, random_state=1)
@@ -133,7 +136,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       elseif modelType == :KNeighborsClassifier
         n_neighbors = modelHyperparameters["n_neighbors"]
 
-        if numClasses == 1
+        if !doRegression
           model = KNeighborsClassifier(n_neighbors=n_neighbors)
         else
           model = KNeighborsRegressor(n_neighbors=n_neighbors)
@@ -152,7 +155,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
 
       outputs = predict(model, testingInputs)
 
-      if unique(outputs) == numClasses
+      if !doRegression
         (
           accuracyPerTraining[numFold],
           errorRatePerTraining[numFold],
@@ -164,30 +167,28 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
           confusionMatrixPerTraining[:, :, numFold],
         ) = confusionMatrix(outputs, testingTargets)
       else
-        cls = false
         (mse[numFold], mae[numFold], msle[numFold], rmse[numFold]) = errorFunction(Float32.(testingTargets), outputs)
       end
 
     end
-
-    acc = mean(accuracyPerTraining)
-    accStd = std(accuracyPerTraining)
-    errorRate = mean(errorRatePerTraining)
-    errorRateStd = std(errorRatePerTraining)
-    sensibility = mean(sensibilityPerTraining)
-    sensibilityStd = std(sensibilityPerTraining)
-    specificity = mean(specificityPerTraining)
-    specificityStd = std(specificityPerTraining)
-    precision = mean(precisionPerTraining)
-    precisionStd = std(precisionPerTraining)
-    negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
-    negativePredictiveValuesStd = std(negativePredictiveValuesPerTraining)
-    f1 = mean(f1PerTraining)
-    f1Std = std(f1PerTraining)
-    matrix = mean(confusionMatrixPerTraining, dims=3)
-
-    if !cls
-      msem = mean(mse)
+    if(!doRegression)
+      acc = mean(accuracyPerTraining)
+      accStd = std(accuracyPerTraining)
+      errorRate = mean(errorRatePerTraining)
+      errorRateStd = std(errorRatePerTraining)
+      sensibility = mean(sensibilityPerTraining)
+      sensibilityStd = std(sensibilityPerTraining)
+      specificity = mean(specificityPerTraining)
+      specificityStd = std(specificityPerTraining)
+      precision = mean(precisionPerTraining)
+      precisionStd = std(precisionPerTraining)
+      negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
+      negativePredictiveValuesStd = std(negativePredictiveValuesPerTraining)
+      f1 = mean(f1PerTraining)
+      f1Std = std(f1PerTraining)
+      matrix = mean(confusionMatrixPerTraining, dims=3)
+    else
+      mse = mean(mse)
       mseDes = std(mse)
       maem = mean(mae)
       maeDes = std(mae)
