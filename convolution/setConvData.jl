@@ -35,16 +35,37 @@ end
 fileoutput = "ConvVHVL.jld2"
 folder = "dataset/train"
 
-num = 2000
+num = 100
+println("Very_High")
 vh = loadFolderImages("$folder/Very_High/", num)
 vhT = Float32.(ones(size(vh, 1)))
 vh = hcat(vh, vhT)
 
+v = vh
+vh = nothing
+vhT = nothing
+GC.gc();
+
+println("Very_Low")
 vl = loadFolderImages("$folder/Very_Low/", num)
 vlT = Float32.(zeros(size(vl, 1)))
 vl = hcat(vl, vlT)
 
-v = vcat(vh, vl)
+v = vcat(v, vl)
+vl = nothing
+vlT = nothing
+GC.gc();
+
+println("Moderate")
+vm = loadFolderImages("$folder/Moderate/", num)
+vmT = Float32.(zeros(size(vm, 1)))
+vm = hcat(vm, vmT)
+
+v = vcat(v, vm)
+vm = nothing
+vmT = nothing
+GC.gc();
+
 v = v[shuffle(1:end), :]
 
-save("comv.jld2","im", v[:,1], "tag", v[:,2])
+save("comvL.jld2","im", v[:,1], "tag", v[:,2])

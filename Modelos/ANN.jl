@@ -19,7 +19,7 @@ include("../metrics.jl")
 
 # Load data
 
-file = "VH-M-VL.jld2"
+file = "VH-M-VL3.jld2"
 
 in = load(file, "in")
 tr = load(file, "tr")
@@ -30,7 +30,7 @@ crossValidation = crossvalidation(tr, 5)
 topologies = [[2], [4], [8], [10], [2, 2], [2, 4], [4, 2], [4, 4]]
 # DecissionTreeClassifier
 for topology in topologies
-    parameters = set_modelHyperparameters(topology=topology, numExecutions=20)
+    parameters = set_modelHyperparameters(topology=topology)
 
     """(acc, _, errorRate, _, sensibility, sensibilityStd, specificity, _,
         precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) =

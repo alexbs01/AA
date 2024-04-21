@@ -355,7 +355,7 @@ function trainRegANN(topology::AbstractArray{<:Int,1},
 
     ann = buildClassANN(size(train_inputs, 2), topology, 1, transferFunctions=transferFunctions)
 
-    loss(x, y) = Losses.mse(ann(x), y)
+    loss(x, y) = Losses.mae(ann(x), y)
 
     trainingLosses = Float32[]
     validationLosses = Float32[]

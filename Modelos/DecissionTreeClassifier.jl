@@ -19,7 +19,7 @@ import .ErrorFunctions: showErrorFunctions;
 
 include("../metrics.jl")
 
-file = "VH-M-VL.jld2"
+file = "VH-M-VL3.jld2"
 
 in = load(file, "in")
 tr = load(file, "tr")
@@ -31,13 +31,20 @@ crossValidation = crossvalidation(tr, 5)
 for max_depth in [4, 6, 8, 12, 18, 24]
   parameters = set_modelHyperparameters(max_depth=max_depth)
 
-  (mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation)
+  (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation)
 
   println("\nMetrics for DecisionTreeClassifier")
   println("Parameters:")
   println("\tMax depth: ", max_depth)
   
-  showErrorFunctions(mse, mae, msle, rmse)
+  println("mse: ", mse)
+    println("mse (std): ", mseStd)
+    println("mae: ", mae)
+    println("mae (std): ", maeStd)
+    println("msle: ", msle)
+    println("msle (std): ", msleStd)
+    println("rmse: ", rmse)
+    println("rmse (std): ", rmseStd)
 
 end
 

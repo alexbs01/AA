@@ -21,7 +21,7 @@ import .ErrorFunctions: showErrorFunctions;
 
 
 
-file = "VH-M-VL.jld2"
+file = "VH-M-VL3.jld2"
 
 in = load(file, "in")
 tr = load(file, "tr")
@@ -35,11 +35,18 @@ crossValidation = crossvalidation(tr, 5)
 for n_neighbors in [2, 4, 6, 8, 16, 24]
     parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
 
-    (mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:KNeighborsClassifier, parameters, in, tr, crossValidation)
+    (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd) = modelCrossValidation(:KNeighborsClassifier, parameters, in, tr, crossValidation)
 
     println("\nMetrics for KNeighborsClassifier")
     println("Parameters:")
     println("\tn_neighbors: ", n_neighbors)
 
-    showErrorFunctions(mse, mae, msle, rmse)
+    println("mse: ", mse)
+    println("mse (std): ", mseStd)
+    println("mae: ", mae)
+    println("mae (std): ", maeStd)
+    println("msle: ", msle)
+    println("msle (std): ", msleStd)
+    println("rmse: ", rmse)
+    println("rmse (std): ", rmseStd)
 end

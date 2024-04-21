@@ -95,25 +95,25 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         classWeight = "balanced"
 
         if kernel == "linear"
-          if numClasses == 2
+          if numClasses == 0
             model = SVC(kernel=kernel, C=C, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C)
           end
         elseif kernel == "poly"
-          if numClasses == 2
+          if numClasses == 0
             model = SVC(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C, degree=degree, gamma=gamma, coef0=coef0)
           end
         elseif kernel == "rbf"
-          if numClasses == 2
+          if numClasses == 0
             model = SVC(kernel=kernel, C=C, gamma=gamma, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C, gamma=gamma)
           end
         elseif kernel == "sigmoid"
-          if numClasses == 2
+          if numClasses == 0
             model = SVC(kernel=kernel, C=C, gamma=gamma, coef0=coef0, class_weight=classWeight)
           else
             model = SVR(kernel=kernel, C=C, gamma=gamma, coef0=coef0)
@@ -123,7 +123,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       elseif modelType == :DecissionTreeClassifier
         max_depth = modelHyperparameters["max_depth"]
 
-        if numClasses == 2
+        if numClasses == 1
           model = DecisionTreeClassifier(max_depth=max_depth, random_state=1)
         else
           model = DecisionTreeRegressor(max_depth=max_depth, random_state=1)
@@ -133,7 +133,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       elseif modelType == :KNeighborsClassifier
         n_neighbors = modelHyperparameters["n_neighbors"]
 
-        if numClasses == 2
+        if numClasses == 1
           model = KNeighborsClassifier(n_neighbors=n_neighbors)
         else
           model = KNeighborsRegressor(n_neighbors=n_neighbors)
@@ -187,16 +187,16 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
     matrix = mean(confusionMatrixPerTraining, dims=3)
 
     if !cls
-      mse = mean(mse)
+      msem = mean(mse)
       mseDes = std(mse)
-      mae = mean(mae)
+      maem = mean(mae)
       maeDes = std(mae)
-      msle = mean(msle)
+      mslem = mean(msle)
       msleDes = std(msle)
-      rmse = mean(rmse)
+      rmsem = mean(rmse)
       rmseDes = std(rmse)
 
-      return (mse, mseDes, mae, maeDes, msle, msleDes, rmse, rmseDes)
+      return (msem, mseDes, maem, maeDes, mslem, msleDes, rmsem, rmseDes)
     end
   end
 
