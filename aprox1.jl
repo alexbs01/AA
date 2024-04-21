@@ -24,7 +24,7 @@ Random.seed!(88008)
 
 # Cargar datos y Extraer las características de esa aproximación 
 
-file = "VH-M-VL.jld2"
+file = "VH-VL.jld2"
 
 inputs = load(file, "in")
 targets = load(file, "tr")
@@ -33,6 +33,7 @@ targets = vec(targets)
 
 crossValidationIndices = crossvalidation(targets, 5)
 
+#Modelos a probar
 models = ["ANN", "SVC", "KNN", "DecisionTree"]
 
 
@@ -66,7 +67,7 @@ for model in models
         
                     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                         precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                        matrix) = modelCrossValidation(:SVC, parameters, in, targets, crossValidationIndices)
+                        matrix) = modelCrossValidation(:SVC, parameters, inputs, targets, crossValidationIndices)
                 
                     println("\nMetrics for SVC with kernel: ", kernel)
                     println("Parameters:")
@@ -86,7 +87,7 @@ for model in models
 
                     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                         precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                        matrix) = modelCrossValidation(:SVC, parameters, in, targets, crossValidationIndices)
+                        matrix) = modelCrossValidation(:SVC, parameters, inputs, targets, crossValidationIndices)
                         println("\nMetrics for SVC with kernel: ", kernel)
                     println("Parameters:")
                     println("\tC: ", c)
@@ -107,7 +108,7 @@ for model in models
 
                     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                         precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                        matrix) = modelCrossValidation(:SVC, parameters, in, targets, crossValidationIndices)
+                        matrix) = modelCrossValidation(:SVC, parameters, inputs, targets, crossValidationIndices)
 
                     println("\nMetrics for SVC with kernel: ", kernel)
                     println("Parameters:")
@@ -127,7 +128,7 @@ for model in models
 
                     (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                         precision, stdPrecision, negativePredictiveValues, _, f1, _, 
-                        matrix) = modelCrossValidation(:SVC, parameters, in, targets, crossValidationIndices)
+                        matrix) = modelCrossValidation(:SVC, parameters, inputs, targets, crossValidationIndices)
 
                     println("\nMetrics for SVC with kernel: ", kernel)
                     println("Parameters:")
@@ -145,7 +146,7 @@ for model in models
             parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
 
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-                precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:KNeighborsClassifier, parameters, in, targets, crossValidationIndices)
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:KNeighborsClassifier, parameters, inputs, targets, crossValidationIndices)
 
             println("\nMetrics for KNeighborsClassifier")
             println("Parameters:")
@@ -160,7 +161,7 @@ for model in models
             parameters = set_modelHyperparameters(max_depth=max_depth)
           
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-              precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, targets, crossValidationIndices)
+              precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) = modelCrossValidation(:DecissionTreeClassifier, parameters, inputs, targets, crossValidationIndices)
           
             println("\nMetrics for DecisionTreeClassifier")
             println("Parameters:")

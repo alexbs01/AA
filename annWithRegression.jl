@@ -6,7 +6,7 @@ using Flux.Losses
 
 export oneHotEncoding, calculateMinMaxNormalizationParameters, calculateZeroMeanNormalizationParameters,
     normalizeMinMax!, normalizeMinMax, normalizeZeroMean!, normalizeZeroMean,
-    classifyOutputs, accuracy, buildClassANN, trainClassANN
+    classifyOutputs, accuracy, buildClassANN, trainClassANN, trainRegANN
 
 # ONE HOT ENCODING
 function oneHotEncoding(feature::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
