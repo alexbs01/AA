@@ -123,8 +123,8 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
             #Si validationratio es mayor que 0, 
             if (validationRatio > 0)
                 trainSize = length(trainIndexes)
-                validationRatio = validationRatio * trainSize / (length(crossValidationIndices))
-                trainIndexes, valIndexes = holdOut(trainSize, validationRatio)
+                validationRatio2 = validationRatio * trainSize / (length(crossValidationIndices))
+                trainIndexes, valIndexes = holdOut(trainSize, validationRatio2)
 
                 validationInputs = trainInputs[valIndexes, :]
                 trainInputs = trainInputs[trainIndexes, :]
@@ -203,7 +203,6 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
 
         trainTargets = targets[trainIndexes]
         testTargets = targets[testIndexes]
-        println(typeof(targets))
 
         
         foldMse = zeros(numExecutions)
@@ -212,20 +211,18 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
         foldRmse = zeros(numExecutions)
 
         for exec in 1:numExecutions
-            println("Iteración ", exec)
 
             #Si validationratio es mayor que 0, 
             if (validationRatio > 0)
                 trainSize = length(trainIndexes)
-                validationRatio = validationRatio * trainSize / (length(crossValidationIndices))
-                trainIndexes, valIndexes = holdOut(trainSize, validationRatio)
+                validationRatio2 = validationRatio * trainSize / (length(crossValidationIndices))
+                trainIndexes, valIndexes = holdOut(trainSize, validationRatio2)
 
                 validationInputs = trainInputs[valIndexes, :]
                 trainInputs = trainInputs[trainIndexes, :]
 
                 validationTargets = trainTargets[valIndexes]
                 trainTargets = trainTargets[trainIndexes]
-                println(typeof(targets))
                 (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
                     validationDataset=(validationInputs, validationTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
@@ -247,9 +244,8 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
         mse[fold] = mean(foldMse)
         mae[fold] = mean(foldMae)
         rmse[fold] = mean(foldRmse)
-        msle[fold] = mean(foldmsle)
+        msle[fold] = mean(foldMsle)
 
-        println("Finished fold: ", fold)
 
     end
 

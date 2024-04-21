@@ -334,10 +334,11 @@ function buildRegANN(numInputs::Int, topology::AbstractArray{<:Int,1}, numOutput
     return ann
 end
 
+
 function trainRegANN(topology::AbstractArray{<:Int,1},
     trainingDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}};
-    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
-    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), falses(0, 0)),
+    validationDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), zeros(0, 0)),
+    testDataset::Tuple{AbstractArray{<:Real,2},AbstractArray{<:Real,1}}=(Array{eltype(trainingDataset[1]),2}(undef, 0, 0), zeros(0, 0)),
     transferFunctions::AbstractArray{<:Function,1}=fill(σ, length(topology)),
     maxEpochs::Int=1000,
     minLoss::Real=0.0,

@@ -120,8 +120,8 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
             #Si validationratio es mayor que 0, 
             if (validationRatio > 0)
                 trainSize = length(trainIndexes)
-                validationRatio = validationRatio * trainSize / (length(crossValidationIndices))
-                trainIndexes, valIndexes = holdOut(trainSize, validationRatio)
+                validationRatio2 = validationRatio * trainSize / (length(crossValidationIndices))
+                trainIndexes, valIndexes = holdOut(trainSize, validationRatio2)
 
                 validationInputs = trainInputs[valIndexes, :]
                 trainInputs = trainInputs[trainIndexes, :]
