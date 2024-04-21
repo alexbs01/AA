@@ -25,4 +25,5 @@ Manifest.toml
 
 dataset/
 comv.jld2
+comvL.jld2
 *.tar.gz

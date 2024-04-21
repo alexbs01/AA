@@ -190,14 +190,14 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
     else
       mse = mean(mse)
       mseDes = std(mse)
-      mae = mean(mae)
+      maem = mean(mae)
       maeDes = std(mae)
-      msle = mean(msle)
+      mslem = mean(msle)
       msleDes = std(msle)
-      rmse = mean(rmse)
+      rmsem = mean(rmse)
       rmseDes = std(rmse)
 
-      return (mse, mseDes, mae, maeDes, msle, msleDes, rmse, rmseDes)
+      return (msem, mseDes, maem, maeDes, mslem, msleDes, rmsem, rmseDes)
     end
   end
 

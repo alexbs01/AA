@@ -84,19 +84,72 @@ function stdRGB(image::Array{Float64,3})
   [std(image[:, :, 1]) std(image[:, :, 2]) std(image[:, :, 3])]
 end
 
-function imageLoader(folder::String, type::Float64)
+function imageLoader(folder::String, type::Float64, numPerClass::Integer)
   imagArr = Array{Any}(undef, 0, 7)
   for fileName in readdir(folder)
+    numPerClass -= 1
+    if numPerClass == 0
+      break
+    end
     imag = imageToColorArray(load(string(folder, fileName)))
     imagArr = vcat(imagArr, hcat(meanRGB(imag), stdRGB(imag), type))
   end
   return imagArr
 end
 
-function generateDataFile(out::String, sources::Array{Tuple{String,Float64}})
+function imageLoader2(folder::String, type::Float64, numPerClass::Integer)
+  imagArr = Array{Any}(undef, 0, 9)
+  for fileName in readdir(folder)
+    numPerClass -= 1
+    if numPerClass == 0
+      break
+    end
+    imag = imageToColorArray(load(string(folder, fileName)))
+
+    cord = split(fileName, "_")
+    
+    lat = cord[size(cord,1)]
+    lat = parse(Float32, String.(lat[1:end-4]))
+    alt = parse(Float32, String.(cord[size(cord, 1)-1]))
+
+    imagArr = vcat(imagArr, hcat(meanRGB(imag), stdRGB(imag), lat, alt, type))
+  end
+  return imagArr
+end
+
+imageToGrayArray(image:: Array{RGB{Normed{UInt8,8}},2}) = convert(Array{Float64,2}, gray.(Gray.(image)));
+imageToGrayArray(image::Array{RGBA{Normed{UInt8,8}},2}) = imageToGrayArray(RGB.(image));
+function meanGray(image::Array{Float64,2})
+  [mean(image[:, 1]) mean(image[:, 2])]
+end
+function stdGray(image::Array{Float64,2})
+  [std(image[:, 1]) std(image[:, 2])]
+end
+
+function imageLoader3(folder::String, type::Float64, numPerClass::Integer)
+  imagArr = Array{Any}(undef, 0, 13)
+  for fileName in readdir(folder)
+    numPerClass -= 1
+    if numPerClass == 0
+      break
+    end
+    imag = imageToColorArray(load(string(folder, fileName)))
+    imagG = imageToGrayArray(load(string(folder, fileName)))
+
+    cord = split(fileName, "_")
+    lat = cord[size(cord,1)]
+    lat = parse(Float32, String.(lat[1:end-4]))
+    alt = parse(Float32, String.(cord[size(cord, 1)-1]))
+
+    imagArr = vcat(imagArr, hcat(meanRGB(imag), stdRGB(imag), meanGray(imagG), stdGray(imagG), lat, alt, type))
+  end
+  return imagArr
+end
+
+function generateDataFile(out::String, sources::Array{Tuple{String,Float64}}, numPerClass::Integer)
   data = Array{Any}(undef, 0, 7)
   for (source, val) in sources
-    sorTR = imageLoader("dataset/train/$source/", val)
+    sorTR = imageLoader("dataset/train/$source/", val, numPerClass)
     #sorVa = imageLoader("dataset/val/$source/", val)
     data = vcat(data, sorTR)
     #data = vcat(data, sorVa)
@@ -107,6 +160,53 @@ function generateDataFile(out::String, sources::Array{Tuple{String,Float64}})
   input = Float32.(input)
 
   targt = data[:, 7]
+
+  save(out,
+    "in", normalizeMinMax(input, Normalization),
+    "tr", targt,
+    "norm", Normalization
+  )
+end
+
+function generateDataFile2(out::String, sources::Array{Tuple{String,Float64}}, numPerClass::Integer)
+  data = Array{Any}(undef, 0, 9)
+  for (source, val) in sources
+    sorTR = imageLoader2("dataset/train/$source/", val, numPerClass)
+    #sorVa = imageLoader("dataset/val/$source/", val)
+
+    data = vcat(data, sorTR)
+    #data = vcat(data, sorVa)
+    println(source)
+  end
+  Normalization = calculateMinMaxNormalizationParameters(Float32.(data[:, 1:8]))
+  input = data[:, 1:8]
+  input = Float32.(input)
+
+  targt = data[:, 9]
+
+
+  save(out,
+    "in", normalizeMinMax(input, Normalization),
+    "tr", targt,
+    "norm", Normalization
+  )
+end
+
+function generateDataFile3(out::String, sources::Array{Tuple{String,Float64}}, numPerClass::Integer)
+  data = Array{Any}(undef, 0, 13)
+  for (source, val) in sources
+    sorTR = imageLoader3("dataset/train/$source/", val, numPerClass)
+    #sorVa = imageLoader("dataset/val/$source/", val)
+
+    data = vcat(data, sorTR)
+    #data = vcat(data, sorVa)
+    println(source)
+  end
+  Normalization = calculateMinMaxNormalizationParameters(Float32.(data[:, 1:12]))
+  input = data[:, 1:12]
+  input = Float32.(input)
+
+  targt = data[:, 13]
 
   save(out,
     "in", normalizeMinMax(input, Normalization),
