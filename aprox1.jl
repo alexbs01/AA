@@ -34,7 +34,7 @@ targets = vec(targets)
 crossValidationIndices = crossvalidation(targets, 5)
 
 #Modelos a probar
-models = ["ANN", "SVC", "KNN", "DecisionTree"]
+models = ["ANN"]
 
 
 # Llamar a la función modelCrossValidation para realizar validación cruzada con

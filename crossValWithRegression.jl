@@ -117,22 +117,23 @@ function ANNCrossValidation(topology::AbstractArray{<:Int,1},
         foldF1s = zeros(numExecutions)
         foldMatrix = zeros(numClassifiers, numClassifiers, numExecutions)
 
+        trainSize = length(trainIndexes)
 
         for exec in 1:numExecutions
 
             #Si validationratio es mayor que 0, 
             if (validationRatio > 0)
-                trainSize = length(trainIndexes)
-                validationRatio2 = validationRatio * trainSize / (length(crossValidationIndices))
-                trainIndexes, valIndexes = holdOut(trainSize, validationRatio2)
+                validationRatio2 = validationRatio * numFolds/(numFolds - 1)
+
+                valIndexes, trainIndexes = holdOut(trainSize, validationRatio2)
 
                 validationInputs = trainInputs[valIndexes, :]
-                trainInputs = trainInputs[trainIndexes, :]
+                trainInputs2 = trainInputs[trainIndexes, :]
 
                 validationTargets = trainTargets[valIndexes, :]
-                trainTargets = trainTargets[trainIndexes, :]
+                trainTargets2 = trainTargets[trainIndexes, :]
 
-                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs, trainTargets),
+                (bestAnn, _, _, _) = trainClassANN(topology, (trainInputs2, trainTargets2),
                     validationDataset=(validationInputs, validationTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
@@ -212,16 +213,17 @@ function regANNCrossValidation(topology::AbstractArray{<:Int,1},
 
             #Si validationratio es mayor que 0, 
             if (validationRatio > 0)
-                trainSize = length(trainIndexes)
-                validationRatio2 = validationRatio * trainSize / (length(crossValidationIndices))
-                trainIndexes, valIndexes = holdOut(trainSize, validationRatio2)
+                validationRatio2 = validationRatio * numFolds/(numFolds - 1)
+
+                valIndexes, trainIndexes = holdOut(trainSize, validationRatio2)
 
                 validationInputs = trainInputs[valIndexes, :]
-                trainInputs = trainInputs[trainIndexes, :]
+                trainInputs2 = trainInputs[trainIndexes, :]
 
-                validationTargets = trainTargets[valIndexes]
-                trainTargets = trainTargets[trainIndexes]
-                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs, trainTargets),
+                validationTargets = trainTargets[valIndexes, :]
+                trainTargets2 = trainTargets[trainIndexes, :]
+
+                (bestAnn, _, _, _) = trainRegANN(topology, (trainInputs2, trainTargets2),
                     validationDataset=(validationInputs, validationTargets),
                     testDataset=(testInputs, testTargets), learningRate=learningRate, maxEpochs=maxEpochs,
                     maxEpochsVal=maxEpochsVal, transferFunctions=transferFunctions, minLoss=minLoss)
