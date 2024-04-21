@@ -51,7 +51,7 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
     numExecutions = modelHyperparameters["numExecutions"]
 
 
-    if(doRegression)
+    if doRegression
       (mse, mseStd), (mae, maeStd), (msle, msleStd), (rmse, rmseStd) =
       regANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
         transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,

@@ -32,19 +32,8 @@ topologies = [[2], [4], [8], [10], [2, 2], [2, 4], [4, 2], [4, 4]]
 for topology in topologies
     parameters = set_modelHyperparameters(topology=topology)
 
-    """(acc, _, errorRate, _, sensibility, sensibilityStd, specificity, _,
-        precision, precisionStd, negativePredictiveValues, _, f1, _, matrix) =
-         modelCrossValidation(:ANN, parameters, in, tr, crossValidation)
-
-    println("\nMetrics for ANN")
-    println("Parameters:")
-    println("\tTopology: ", topology)
-    _show_metrics(acc, errorRate, sensibility, sensibilityStd, specificity, precision, precisionStd,
-        negativePredictiveValues, f1, matrix)"""
-
-
     (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd) =
-     modelCrossValidation(:ANN, parameters, in, tr, crossValidation)
+     modelCrossValidation(:ANN, parameters, in, tr, crossValidation, true)
 
     println("\nMetrics for ANN")
     println("Parameters:")
