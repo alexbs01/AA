@@ -144,11 +144,15 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       trainIndex = findall(crossValidationIndices .!= numFold)
       testIndex = findall(crossValidationIndices .== numFold)
 
+			println("a")
       trainingInputs = inputs[trainIndex, :]
       trainingTargets = targets[trainIndex]
       testingInputs = inputs[testIndex, :]
       testingTargets = targets[testIndex]
 
+			println("a")
+			println(trainingInputs)
+			println(trainingTargets)
       model = fit!(model, trainingInputs, trainingTargets)
 
       outputs = predict(model, testingInputs)
