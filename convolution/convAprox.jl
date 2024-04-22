@@ -16,7 +16,7 @@ function convertirArrayImagenesHWCN(imagenes)
 	return nuevoArray
 end;
 
-file = "comvL.jld2"
+file = "comv.jld2"
 
 in = load(file, "im")
 tr = load(file, "tag")
@@ -28,6 +28,11 @@ train_labels = tr[1:tra, :]
 test_imgs    = in[tra+1:end, :]
 test_labels  = tr[1:tra, :]
 labels       = 0:9
+
+
+in = nothing;
+tr = nothing;
+GC.gc()
 
 train_imgs = convertirArrayImagenesHWCN(train_imgs);
 test_imgs = convertirArrayImagenesHWCN(test_imgs);
@@ -72,7 +77,7 @@ end
 
 ann(train_set[numBatchCoger][1][:, :, :, numImagenEnEseBatch]);
 
-loss(ann, x, y) = Losses.mse(ann(x), y);
+loss(ann, x, y) = Losses.mae(ann(x), y);
 mae(batch) = mean(abs.(ann(batch[1]) .- batch[2]));
 
 opt_state = Flux.setup(Adam(0.001), ann);

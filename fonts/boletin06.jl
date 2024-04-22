@@ -32,8 +32,6 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
   inputs::AbstractArray{<:Real,2}, targets::AbstractArray{<:Any,1},
   crossValidationIndices::Array{Int64,1}, doRegression::Bool=false)
 
-  cls = true
-
   @assert size(inputs, 1) == size(targets, 1) "Inputs and targets must have the same number of samples"
   @assert (modelType == :SVC) ||
           (modelType == :DecissionTreeClassifier) ||
@@ -53,13 +51,13 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
 
     if doRegression
       (mse, mseStd), (mae, maeStd), (msle, msleStd), (rmse, rmseStd) =
-      regANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
-        transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
-        validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)
+        regANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
+          transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
+          validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)
 
-        return (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd)
+      return (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd)
     end
-    
+
     (acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
     (precision, precisionStd), (negativePredictiveValues, negativePredictiveValuesStd), (f1, f1Std), matrix =
       ANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
@@ -168,27 +166,40 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
         ) = confusionMatrix(outputs, testingTargets)
       else
         (mse[numFold], mae[numFold], msle[numFold], rmse[numFold]) = errorFunction(Float32.(testingTargets), outputs)
+
+        (
+          accuracyPerTraining[numFold],
+          errorRatePerTraining[numFold],
+          sensibilityPerTraining[numFold],
+          specificityPerTraining[numFold],
+          precisionPerTraining[numFold],
+          negativePredictiveValuesPerTraining[numFold],
+          f1PerTraining[numFold],
+          confusionMatrixPerTraining[:, :, numFold],
+        ) = confusionMatrix(encoder(outputs, sort(unique(testingTargets))), testingTargets)
+
       end
 
     end
-    if(!doRegression)
-      acc = mean(accuracyPerTraining)
-      accStd = std(accuracyPerTraining)
-      errorRate = mean(errorRatePerTraining)
-      errorRateStd = std(errorRatePerTraining)
-      sensibility = mean(sensibilityPerTraining)
-      sensibilityStd = std(sensibilityPerTraining)
-      specificity = mean(specificityPerTraining)
-      specificityStd = std(specificityPerTraining)
-      precision = mean(precisionPerTraining)
-      precisionStd = std(precisionPerTraining)
-      negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
-      negativePredictiveValuesStd = std(negativePredictiveValuesPerTraining)
-      f1 = mean(f1PerTraining)
-      f1Std = std(f1PerTraining)
-      matrix = mean(confusionMatrixPerTraining, dims=3)
-    else
-      mse = mean(mse)
+
+    acc = mean(accuracyPerTraining)
+    accStd = std(accuracyPerTraining)
+    errorRate = mean(errorRatePerTraining)
+    errorRateStd = std(errorRatePerTraining)
+    sensibility = mean(sensibilityPerTraining)
+    sensibilityStd = std(sensibilityPerTraining)
+    specificity = mean(specificityPerTraining)
+    specificityStd = std(specificityPerTraining)
+    precision = mean(precisionPerTraining)
+    precisionStd = std(precisionPerTraining)
+    negativePredictiveValues = mean(negativePredictiveValuesPerTraining)
+    negativePredictiveValuesStd = std(negativePredictiveValuesPerTraining)
+    f1 = mean(f1PerTraining)
+    f1Std = std(f1PerTraining)
+    matrix = mean(confusionMatrixPerTraining, dims=3)
+
+    if (doRegression)
+      msem = mean(mse)
       mseDes = std(mse)
       maem = mean(mae)
       maeDes = std(mae)
@@ -197,7 +208,10 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       rmsem = mean(rmse)
       rmseDes = std(rmse)
 
-      return (msem, mseDes, maem, maeDes, mslem, msleDes, rmsem, rmseDes)
+      return (acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd,
+        specificity, specificityStd, precision, precisionStd, negativePredictiveValues,
+        negativePredictiveValuesStd, f1, f1Std, matrix, msem, mseDes, maem, maeDes,
+        mslem, msleDes, rmsem, rmseDes)
     end
   end
 
@@ -244,6 +258,25 @@ function set_modelHyperparameters(; kernel::String="linear", C::Float64=0.0,
   dict["numExecutions"] = numExecutions
 
   return dict
+end
+
+function encoder(vector::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
+  numClasses = length(classes)
+  arrMids = []
+
+  for i in 2:numClasses
+    push!(arrMids, ((classes[i] - classes[i-1]) / 2) + classes[i-1])
+  end
+
+  encoded = falses(length(vector), numClasses)
+
+  encoded[:, 1] .= (<=).(vector, arrMids[1])
+  for i in 2:(numClasses-1)
+    encoded[:, i] .= (==).(((<=).(vector, arrMids[i])), ((>).(vector, arrMids[i-1])))
+  end
+  encoded[:, numClasses] .= (>).(vector, arrMids[numClasses-1])
+
+  return encoded
 end
 
 end
