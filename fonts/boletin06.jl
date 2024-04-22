@@ -144,15 +144,11 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
       trainIndex = findall(crossValidationIndices .!= numFold)
       testIndex = findall(crossValidationIndices .== numFold)
 
-			println("a")
       trainingInputs = inputs[trainIndex, :]
       trainingTargets = targets[trainIndex]
       testingInputs = inputs[testIndex, :]
       testingTargets = targets[testIndex]
 
-			println("a")
-			println(trainingInputs)
-			println(trainingTargets)
       model = fit!(model, trainingInputs, trainingTargets)
 
       outputs = predict(model, testingInputs)
@@ -266,21 +262,28 @@ end
 
 function encoder(vector::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
   numClasses = length(classes)
+  lengthVect = length(vector)
   arrMids = []
 
   for i in 2:numClasses
     push!(arrMids, ((classes[i] - classes[i-1]) / 2) + classes[i-1])
   end
 
-  encoded = falses(length(vector), numClasses)
+  encoded = zeros(Float32, size(vector, 1))
 
-  encoded[:, 1] .= (<=).(vector, arrMids[1])
-  for i in 2:(numClasses-1)
-    encoded[:, i] .= (==).(((<=).(vector, arrMids[i])), ((>).(vector, arrMids[i-1])))
+  for i in 1:lengthVect
+    element = vector[i]
+
+    for j in 1:(numClasses-1)
+      if element < arrMids[j]
+        encoded[i] = classes[j]
+        break
+      end
+      encoded[i] = classes[j+1]
+    end
   end
-  encoded[:, numClasses] .= (>).(vector, arrMids[numClasses-1])
 
-  return encoded
+	return encoded
 end
 
 end

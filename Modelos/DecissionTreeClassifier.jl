@@ -32,7 +32,7 @@ for max_depth in [4, 6, 8, 12, 18, 24]
   parameters = set_modelHyperparameters(max_depth=max_depth)
 
   (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-    precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation)
+    precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation, true)
 
   println("\nMetrics for DecisionTreeClassifier")
   println("Parameters:")

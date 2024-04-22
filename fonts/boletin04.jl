@@ -104,7 +104,7 @@ function confusionMatrix(outputs::AbstractArray{Bool,1}, targets::AbstractArray{
   VN = count((outputs .+ targets) .== 0)
   FP = count(((outputs .== false) .+ targets) .== 0)
   FN = count(((outputs .== false) .+ targets) .== 2)
-	conf = [VP FP; FN VN]
+  conf = [VP FP; FN VN]
 
   pre = (VN + VP) / (VN + VP + FN + FP)
   err = (FN + FP) / (VN + VP + FN + FP)
@@ -119,7 +119,7 @@ end
 function confusionMatrix(outputs::AbstractArray{<:Real,1},
   targets::AbstractArray{<:Real,1}; threshold::Real=0.5)
   return confusionMatrix(broadcast(>=, outputs, threshold), broadcast(>=, targets, threshold))
-end 
+end
 
 function confusionMatrix(outputs::AbstractArray{<:Real,1},
   targets::AbstractArray{Bool,1}; threshold::Real=0.5)
@@ -139,7 +139,7 @@ function confusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{
   numClasses = size(targets, 2)
   matrix = zeros(Int64, numClasses, numClasses)
 
-  rows, cols = size(matrix)
+	rows, cols = size(matrix)
   for row in 1:rows
     for col in 1:cols
       matrix[row, col] = sum(outputs[:, row] .== true .& targets[:, col] .== true)
