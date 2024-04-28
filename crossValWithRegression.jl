@@ -95,7 +95,7 @@ function ANNCrossValidation(topology::AbstractArray{<:Int, 1},
 	precision = zeros(numFolds)
 	negativePredictiveValue = zeros(numFolds)
 	F1s = zeros(numFolds)
-	matrixes = zeros(numClassifiers, numClassifiers, numExecutions)
+	matrixes = zeros(numClassifiers, numClassifiers, numFolds)
 
 	for fold in 1:numFolds
 		testIndexes = findall(crossValidationIndices .== fold)  #Para cada fold, se usan los elementos correspondientes como conjunto de test
@@ -183,7 +183,18 @@ function regANNCrossValidation(topology::AbstractArray{<:Int, 1},
 
 	numFolds = maximum(crossValidationIndices)
 
+	numClassifiers = length(unique(targets))
+
 	targets = Float32.(targets)
+
+	accuracy = zeros(numFolds)
+		errorRate = zeros(numFolds)
+		recall = zeros(numFolds)
+		specificity = zeros(numFolds)
+		precision = zeros(numFolds)
+		negativePredictiveValue = zeros(numFolds)
+		F1s = zeros(numFolds)
+		matrixes = zeros(numClassifiers, numClassifiers, numFolds)
 
 	mse = zeros(numFolds)
 	mae = zeros(numFolds)
@@ -201,6 +212,15 @@ function regANNCrossValidation(topology::AbstractArray{<:Int, 1},
 		trainTargets = targets[trainIndexes]
 		testTargets = targets[testIndexes]
 
+
+		foldAccuracy = zeros(numExecutions)
+		foldErrorRate = zeros(numExecutions)
+		foldRecall = zeros(numExecutions)
+		foldSpecificity = zeros(numExecutions)
+		foldPrecision = zeros(numExecutions)
+		foldNPV = zeros(numExecutions)
+		foldF1s = zeros(numExecutions)
+		foldMatrix = zeros(numClassifiers, numClassifiers, numExecutions)
 
 		foldMse = zeros(numExecutions)
 		foldMae = zeros(numExecutions)
@@ -239,6 +259,15 @@ function regANNCrossValidation(topology::AbstractArray{<:Int, 1},
 			outputs = collect(bestAnn(testInputs')')
 
 			(foldMse[exec], foldMae[exec], foldMsle[exec], foldRmse[exec]) = errorFunction(testTargets, vec(outputs))
+			
+			discreteOutputs = encoder(vec(outputs), sort(unique(testTargets)))
+
+			classes = unique(testTargets)
+
+			(foldAccuracy[exec], foldErrorRate[exec], foldRecall[exec], foldSpecificity[exec], foldPrecision[exec],
+				foldNPV[exec], foldF1s[exec], foldMatrix[:, :, exec]
+				) = confusionMatrix(oneHotEncoding(discreteOutputs, classes), oneHotEncoding(testTargets, classes))
+
 
 		end
 		#hacer la media de los resultados obtenidos en confusionMatrix
@@ -247,11 +276,50 @@ function regANNCrossValidation(topology::AbstractArray{<:Int, 1},
 		rmse[fold] = mean(foldRmse)
 		msle[fold] = mean(foldMsle)
 
+		accuracy[fold] = mean(foldAccuracy)
+		errorRate[fold] = mean(foldErrorRate)
+		recall[fold] = mean(foldRecall)
+		specificity[fold] = mean(foldSpecificity)
+		precision[fold] = mean(foldPrecision)
+		negativePredictiveValue[fold] = mean(foldNPV)
+		F1s[fold] = mean(foldF1s)
+		matrixes[:, :, fold] = mean(foldMatrix, dims = 3)
+
 
 	end
 
-	return (mean(mse, dims = 1), std(mse, dims = 1)), (mean(mae, dims = 1), std(mae, dims = 1)),
+	return (mean(accuracy, dims = 1), std(accuracy, dims = 1)), (mean(errorRate, dims = 1), std(errorRate, dims = 1)),
+	(mean(recall, dims = 1), std(recall, dims = 1)), (mean(specificity, dims = 1), std(specificity, dims = 1)),
+	(mean(precision, dims = 1), std(precision, dims = 1)), (mean(negativePredictiveValue, dims = 1),
+		std(negativePredictiveValue, dims = 1)), (mean(F1s, dims = 1), std(F1s, dims = 1)), mean(matrixes, dims = 3),
+		(mean(mse, dims = 1), std(mse, dims = 1)), (mean(mae, dims = 1), std(mae, dims = 1)),
 	(mean(msle, dims = 1), std(msle, dims = 1)), (mean(rmse, dims = 1), std(rmse, dims = 1))
 end
+
+function encoder(vector::AbstractArray{<:Any,1}, classes::AbstractArray{<:Any,1})
+	numClasses = length(classes)
+	lengthVect = length(vector)
+	arrMids = []
+  
+	for i in 2:numClasses
+	  push!(arrMids, ((classes[i] - classes[i-1]) / 2) + classes[i-1])
+	end
+  
+	encoded = zeros(Float32, size(vector, 1))
+  
+	for i in 1:lengthVect
+	  element = vector[i]
+  
+	  for j in 1:(numClasses-1)
+		if element < arrMids[j]
+		  encoded[i] = classes[j]
+		  break
+		end
+		encoded[i] = classes[j+1]
+	  end
+	end
+  
+	  return encoded
+  end
 
 end
