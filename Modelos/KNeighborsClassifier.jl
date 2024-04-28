@@ -19,7 +19,7 @@ import .CrossValidation: crossvalidation;
 import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 import .ErrorFunctions: showErrorFunctions;
 
-
+Random.seed!(88008)
 
 file = "VH-M-VL3.jld2"
 

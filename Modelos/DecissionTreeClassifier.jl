@@ -19,6 +19,8 @@ import .ErrorFunctions: showErrorFunctions;
 
 include("../metrics.jl")
 
+Random.seed!(88008)s
+
 file = "VH-M-VL.jld2"
 
 in = load(file, "in")

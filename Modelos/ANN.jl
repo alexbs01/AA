@@ -17,6 +17,8 @@ import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 
 include("../metrics.jl")
 
+Random.seed!(88008)
+
 # Load data
 
 file = "VH-M-VL3.jld2"
