@@ -132,7 +132,7 @@ function confusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{
   weighted::Bool=true)
 
   #@assert all([in(output, unique(targets)) for output in outputs]) "The outputs must be in the targets"
-  @assert size(outputs, 2) == size(targets, 2) "The size of the outputs and targets must be the same"
+  @assert size(outputs, 2) == size(targets, 2) "The size of the outputs and targets must be the same. Outputs: $(size(outputs, 2)) Targets: $(size(targets, 2))"
   @assert size(outputs, 2) != 2 "The output and target must have more than two features. Outputs: $(size(outputs, 2)) Targets: $(size(targets, 2))"
 
   numSamples = size(targets, 1)
@@ -152,7 +152,8 @@ function confusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{
   sensitivity, specificity, precision, negativePredictiveValue, f1Score = fill(zeros(numClasses), 5)
 
   for class in 1:numClasses
-    _, _, aux_sensitivity, aux_specificity, aux_precision, aux_negativePredictiveValue, aux_f1Score, _ = confusionMatrix(outputs[:, class], targets[:, class])
+    _, _, aux_sensitivity, aux_specificity, aux_precision, aux_negativePredictiveValue,
+    aux_f1Score, _ = confusionMatrix(outputs[:, class], targets[:, class])
 
     sensitivity[class] = aux_sensitivity
     specificity[class] = aux_specificity
@@ -187,6 +188,7 @@ end
 
 function confusionMatrix(outputs::AbstractArray{<:Real,2}, targets::AbstractArray{Bool,2};
   weighted::Bool=true)
+ 
 
   outputs = (classifyOutputs(outputs))
   return confusionMatrix(outputs, targets, weighted=weighted)
@@ -195,6 +197,7 @@ end
 
 function confusionMatrix(outputs::AbstractArray{<:Any,1}, targets::AbstractArray{<:Any,1};
   weighted::Bool=true)
+
 
   classes = unique(targets)
   outputs = oneHotEncoding(outputs, classes)

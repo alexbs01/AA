@@ -4,6 +4,9 @@ using Flux: onehotbatch, onecold
 using JLD2, FileIO
 using Statistics: mean
 
+include("../fonts/boletin02.jl")
+using .ANNUtils: oneHotEncoding
+
 function convertirArrayImagenesHWCN(imagenes)
 	numPatrones = length(imagenes)
 	nuevoArray = Array{Float32, 4}(undef, 320, 320, 3, numPatrones) # Importante que sea un array de Float32
@@ -16,7 +19,7 @@ function convertirArrayImagenesHWCN(imagenes)
 	return nuevoArray
 end;
 
-file = "comv.jld2"
+file = "comvL.jld2"
 
 in = load(file, "im")
 tr = load(file, "tag")
@@ -27,7 +30,7 @@ train_imgs   = in[1:tra, :]
 train_labels = tr[1:tra, :]
 test_imgs    = in[tra+1:end, :]
 test_labels  = tr[1:tra, :]
-labels       = 0:9
+labels       = [0.0; 0.5; 1.0]
 
 
 in = nothing;
@@ -56,7 +59,7 @@ ann = Chain(
 	MaxPool((2, 2)), Conv((3, 3), 16 => 32, pad = (1, 1), relu),
 	MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad = (1, 1), relu),
 	MaxPool((2, 2)), x -> reshape(x, :, size(x, 4)),
-	Dense(51200, 1, σ),
+	Dense(51200, 3), softmax,
 )
 
 numBatchCoger = 1;
@@ -77,13 +80,14 @@ end
 
 ann(train_set[numBatchCoger][1][:, :, :, numImagenEnEseBatch]);
 
-loss(ann, x, y) = Losses.mae(ann(x), y);
-mae(batch) = mean(abs.(ann(batch[1]) .- batch[2]));
+loss(ann, x, y) = (size(y, 1) == 1) ? Losses.binarycrossentropy(ann(x), y) : Losses.crossentropy(ann(x), y);
+accuracy(batch) = mean(onecold(ann(batch[1])) .== onecold(batch[2]));
 
 opt_state = Flux.setup(Adam(0.001), ann);
 
 
-mejorMae = -Inf;
+println("Comenzando entrenamiento...")
+mejorPrecision = -Inf;
 criterioFin = false;
 numCiclo = 0;
 numCicloUltimaMejora = 0;
@@ -91,22 +95,21 @@ mejorModelo = nothing;
 while !criterioFin
 
 	# Hay que declarar las variables globales que van a ser modificadas en el interior del bucle
-	global numCicloUltimaMejora, numCiclo, mejorMae, mejorModelo, criterioFin
-
+	global numCicloUltimaMejora, numCiclo, mejorPrecision, mejorModelo, criterioFin
 	# Se entrena un ciclo
 	Flux.train!(loss, ann, train_set, opt_state)
 
 	numCiclo += 1
 
 	# Se calcula la precision en el conjunto de entrenamiento:
-	maeEntrenamineto = mean(mae.(train_set))
-	println("Ciclo ", numCiclo, ": Mae en el conjunto de entrenamiento: ", 100 * maeEntrenamineto, " %")
+	precisionEntrenamiento = mean(accuracy.(train_set))
+	println("Ciclo ", numCiclo, ": Precision en el conjunto de entrenamiento: ", 100 * precisionEntrenamiento, " %")
 
 	# Si se mejora la precision en el conjunto de entrenamiento, se calcula la de test y se guarda el modelo
-	if (maeEntrenamineto >= mejorMae)
-		mejorMae = maeEntrenamineto
-		maeTest = mae(test_set)
-		println("   Mejora en el conjunto de entrenamiento -> Mae en el conjunto de test: ", 100 * maeTest, " %")
+	if (precisionEntrenamiento >= mejorPrecision)
+		mejorPrecision = precisionEntrenamiento
+		precisionTest = accuracy(test_set)
+		println("   Mejora en el conjunto de entrenamiento -> Precision en el conjunto de test: ", 100 * precisionTest, " %")
 		mejorModelo = deepcopy(ann)
 		numCicloUltimaMejora = numCiclo
 	end
@@ -121,8 +124,8 @@ while !criterioFin
 	# Criterios de parada:
 
 	# Si la precision en entrenamiento es lo suficientemente buena, se para el entrenamiento
-	if (maeEntrenamineto <= 0.01)
-		println("   La Mae ha llegado al 0.01")
+	if (precisionEntrenamiento >= 0.999)
+		println("   Se para el entenamiento por haber llegado a una precision de 99.9%")
 		criterioFin = true
 	end
 

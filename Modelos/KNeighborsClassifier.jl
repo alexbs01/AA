@@ -19,7 +19,7 @@ import .CrossValidation: crossvalidation;
 import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
 import .ErrorFunctions: showErrorFunctions;
 
-
+Random.seed!(88008)
 
 file = "VH-M-VL3.jld2"
 
@@ -33,20 +33,26 @@ crossValidation = crossvalidation(tr, 5)
 
 # KNeighborsClassifier
 for n_neighbors in [2, 4, 6, 8, 16, 24]
-    parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
+  parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
 
-    (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd) = modelCrossValidation(:KNeighborsClassifier, parameters, in, tr, crossValidation)
+  (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+    precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
+    mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
+    modelCrossValidation(:KNeighborsClassifier, parameters, in, tr, crossValidation)
 
-    println("\nMetrics for KNeighborsClassifier")
-    println("Parameters:")
-    println("\tn_neighbors: ", n_neighbors)
+  println("\nMetrics for KNeighborsClassifier")
+  println("Parameters:")
+  println("\tn_neighbors: ", n_neighbors)
 
-    println("mse: ", mse)
-    println("mse (std): ", mseStd)
-    println("mae: ", mae)
-    println("mae (std): ", maeStd)
-    println("msle: ", msle)
-    println("msle (std): ", msleStd)
-    println("rmse: ", rmse)
-    println("rmse (std): ", rmseStd)
+  println("mse: ", mse)
+  println("mse (std): ", mseD)
+  println("mae: ", mae)
+  println("mae (std): ", maeD)
+  println("msle: ", msle)
+  println("msle (std): ", msleD)
+  println("rmse: ", rmse)
+  println("rmse (std): ", rmseD)
+
+  _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+    negativePredictiveValues, f1, matrix)
 end

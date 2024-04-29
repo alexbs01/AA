@@ -35,13 +35,13 @@ function loadFolderImages(folderName::String, num::Int)
   return imageToColorArray.(images)
 end
 
-fileoutput = "ConvVHVL.jld2"
 folder = "dataset/train"
 
 num = 100
 println("Very_High")
 vh = loadFolderImages("$folder/Very_High/", num)
-vhT = Float32.(ones(size(vh, 1)))
+vhT = Int32.(ones(size(vh, 1)))
+fill!(vhT, 2)
 vh = hcat(vh, vhT)
 
 v = vh
@@ -51,7 +51,7 @@ GC.gc();
 
 println("Very_Low")
 vl = loadFolderImages("$folder/Very_Low/", num)
-vlT = Float32.(zeros(size(vl, 1)))
+vlT = Int32.(zeros(size(vl, 1)))
 vl = hcat(vl, vlT)
 
 v = vcat(v, vl)
@@ -61,7 +61,8 @@ GC.gc();
 
 println("Moderate")
 vm = loadFolderImages("$folder/Moderate/", num)
-vmT = Float32.(zeros(size(vm, 1)))
+vmT = Int32.(zeros(size(vm, 1)))
+fill!(vmT, 1)
 vm = hcat(vm, vmT)
 
 v = vcat(v, vm)

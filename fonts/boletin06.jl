@@ -50,12 +50,17 @@ function modelCrossValidation(modelType::Symbol, modelHyperparameters::Dict,
 
 
     if doRegression
+    (acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
+    (precision, precisionStd), (negativePredictiveValue, negativePredictiveValueStd), (f1, f1Std), matrix,
       (mse, mseStd), (mae, maeStd), (msle, msleStd), (rmse, rmseStd) =
         regANNCrossValidation(topology, inputs, targets, crossValidationIndices, numExecutions=numExecutions,
           transferFunctions=transferFunctions, maxEpochs=maxEpochs, learningRate=learningRate,
           validationRatio=validationRatio, maxEpochsVal=maxEpochsVal)
 
-      return (mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd)
+          return acc, accStd, errorRate, errorRateStd, sensibility, sensibilityStd, specificity, specificityStd,
+          precision, precisionStd, negativePredictiveValue, negativePredictiveValueStd, f1, f1Std, matrix,
+          mse, mseStd, mae, maeStd, msle, msleStd, rmse, rmseStd
+
     end
 
     (acc, accStd), (errorRate, errorRateStd), (sensibility, sensibilityStd), (specificity, specificityStd),
