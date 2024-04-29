@@ -15,15 +15,18 @@ function loadFolderImages(folderName::String, num::Int)
   isImageExtension(fileName::String) = any(uppercase(fileName[end-3:end]) .== [".JPG", ".PNG"])
   images = []
   for fileName in readdir(folderName)
-		num -= 1
-		if num == 0 
-			break
-		end
+    num -= 1
+    if num == 0
+      break
+    end
     if isImageExtension(fileName)
       image = load(string(folderName, "/", fileName))
       # Check that they are color images
       @assert(isa(image, Array{RGBA{Normed{UInt8,8}},2}) || isa(image, Array{RGB{Normed{UInt8,8}},2}))
       # Add the image to the vector of images
+
+      #resize to 64x64
+      image = imresize(image, (64, 64))
 
       push!(images, image)
     end
@@ -68,4 +71,4 @@ GC.gc();
 
 v = v[shuffle(1:end), :]
 
-save("comvL.jld2","im", v[:,1], "tag", v[:,2])
+save("comvL.jld2", "im", v[:, 1], "tag", v[:, 2])
