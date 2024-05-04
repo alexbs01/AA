@@ -116,6 +116,7 @@ function confusionMatrix(outputs::AbstractArray{Bool,1}, targets::AbstractArray{
 
   return (pre, err, sen, esp, vpp, vpn, f1, conf)
 end
+
 function confusionMatrix(outputs::AbstractArray{<:Real,1},
   targets::AbstractArray{<:Real,1}; threshold::Real=0.5)
   return confusionMatrix(broadcast(>=, outputs, threshold), broadcast(>=, targets, threshold))
@@ -123,11 +124,11 @@ end
 
 function confusionMatrix(outputs::AbstractArray{<:Real,1},
   targets::AbstractArray{Bool,1}; threshold::Real=0.5)
-
   return confusionMatrix(broadcast(>=, outputs, threshold), targets)
 end
 
 # Boletin04_2
+# no
 function confusionMatrix(outputs::AbstractArray{Bool,2}, targets::AbstractArray{Bool,2};
   weighted::Bool=true)
 
@@ -188,7 +189,6 @@ end
 
 function confusionMatrix(outputs::AbstractArray{<:Real,2}, targets::AbstractArray{Bool,2};
   weighted::Bool=true)
- 
 
   outputs = (classifyOutputs(outputs))
   return confusionMatrix(outputs, targets, weighted=weighted)

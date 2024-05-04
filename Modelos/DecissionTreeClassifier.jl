@@ -19,7 +19,7 @@ import .ErrorFunctions: showErrorFunctions;
 
 include("../metrics.jl")
 
-Random.seed!(88008)s
+Random.seed!(88008)
 
 file = "VH-M-VL.jld2"
 

@@ -24,7 +24,5 @@ docs/site/
 Manifest.toml
 
 dataset/
-comv.jld2
-comvL.jld2
 *.jld2
 *.tar.gz
