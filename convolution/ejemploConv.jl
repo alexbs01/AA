@@ -21,17 +21,17 @@ using Statistics: mean
 include("../fonts/boletin04.jl")
 using .Metrics: confusionMatrix
 
-file = "comvL.jld2"
+file = "comvM.jld2"
 
 in = load(file, "im")
 tr = load(file, "tag")
 
 tra = Int32.(trunc(size(in, 1) * 0.9))
 
-train_imgs   = in[1:tra, :]
+train_imgs = in[1:tra, :]
 train_labels = tr[1:tra, :]
-test_imgs    = in[tra+1:end, :]
-test_labels  = tr[tra+1:end, :]
+test_imgs = in[tra+1:end, :]
+test_labels = tr[tra+1:end, :]
 
 labels = [0; 1; 2]; # Las etiquetas
 
@@ -53,15 +53,15 @@ GC.gc()
 #     Si fuesen en color, Channels = 3 (rojo, verde, azul)
 # Esta conversion se puede hacer con la siguiente funcion:
 function convertirArrayImagenesHWCN(imagenes)
-	numPatrones = length(imagenes)
-	nuevoArray = Array{Float32, 4}(undef, 320, 320, 3, numPatrones) # Importante que sea un array de Float32
-	for i in 1:numPatrones
-		@assert (size(imagenes[i]) == (320, 320, 3)) "Las imagenes no tienen tamaño 320x320"
-		nuevoArray[:, :, 1, i] .= imagenes[i][:, :, 1]
-		nuevoArray[:, :, 2, i] .= imagenes[i][:, :, 2]
-		nuevoArray[:, :, 3, i] .= imagenes[i][:, :, 3]
-	end
-	return nuevoArray
+    numPatrones = length(imagenes)
+    nuevoArray = Array{Float32,4}(undef, 64, 64, 3, numPatrones) # Importante que sea un array de Float32
+    for i in 1:numPatrones
+        @assert (size(imagenes[i]) == (64, 64, 3)) "Las imagenes no tienen tamaño 320x320"
+        nuevoArray[:, :, 1, i] .= imagenes[i][:, :, 1]
+        nuevoArray[:, :, 2, i] .= imagenes[i][:, :, 2]
+        nuevoArray[:, :, 3, i] .= imagenes[i][:, :, 3]
+    end
+    return nuevoArray
 end;
 train_imgs = convertirArrayImagenesHWCN(train_imgs);
 test_imgs = convertirArrayImagenesHWCN(test_imgs);
@@ -110,14 +110,11 @@ GC.gc(); # Pasar el recolector de basura
 funcionTransferenciaCapasConvolucionales = relu;
 
 # Definimos la red con la funcion Chain, que concatena distintas capas
-ann = Chain(Conv((3, 3), 3 => 16, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)), Conv((3, 3), 16 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)), x -> reshape(x, :, size(x, 4)),
-	Dense(800, 3), softmax)
+ann = Chain(Conv((3, 3), 3 => 16, pad=(1, 1), funcionTransferenciaCapasConvolucionales),
+    MaxPool((2, 2)), Conv((3, 3), 16 => 32, pad=(1, 1), funcionTransferenciaCapasConvolucionales),
+    MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad=(1, 1), funcionTransferenciaCapasConvolucionales),
+    MaxPool((2, 2)), x -> reshape(x, :, size(x, 4)),
+    Dense(2048, 3), softmax)
 
 # Vamos a probar la RNA capa por capa y poner algunos datos de cada capa
 # Usaremos como entrada varios patrones de un batch
@@ -133,13 +130,13 @@ entradaCapa = train_set[numBatchCoger][1][:, :, :, numImagenEnEseBatch];
 numCapas = length(Flux.params(ann));
 println("La RNA tiene ", numCapas, " capas:");
 for numCapa in 1:numCapas
-	println("   Capa ", numCapa, ": ", ann[numCapa])
-	# Le pasamos la entrada a esta capa
-	global entradaCapa # Esta linea es necesaria porque la variable entradaCapa es global y se modifica en este bucle
-	capa = ann[numCapa]
-	salidaCapa = capa(entradaCapa)
-	println("      La salida de esta capa tiene dimension ", size(salidaCapa))
-	entradaCapa = salidaCapa
+    println("   Capa ", numCapa, ": ", ann[numCapa])
+    # Le pasamos la entrada a esta capa
+    global entradaCapa # Esta linea es necesaria porque la variable entradaCapa es global y se modifica en este bucle
+    capa = ann[numCapa]
+    salidaCapa = capa(entradaCapa)
+    println("      La salida de esta capa tiene dimension ", size(salidaCapa))
+    entradaCapa = salidaCapa
 end
 
 # Sin embargo, para aplicar un patron no hace falta hacer todo eso.
@@ -166,7 +163,7 @@ println("Ciclo 0: Precision en el conjunto de entrenamiento: ", 100 * mean(accur
 
 
 # Optimizador que se usa: ADAM, con esta tasa de aprendizaje:
-eta = 0.01;
+eta = 0.1;
 opt_state = Flux.setup(Adam(eta), ann);
 
 
@@ -179,61 +176,61 @@ mejorModelo = nothing;
 
 while !criterioFin
 
-	# Hay que declarar las variables globales que van a ser modificadas en el interior del bucle
-	global numCicloUltimaMejora, numCiclo, mejorPrecision, mejorModelo, criterioFin
+    # Hay que declarar las variables globales que van a ser modificadas en el interior del bucle
+    global numCicloUltimaMejora, numCiclo, mejorPrecision, mejorModelo, criterioFin
 
-	# Se entrena un ciclo
-	Flux.train!(loss, ann, train_set, opt_state)
+    # Se entrena un ciclo
+    Flux.train!(loss, ann, train_set, opt_state)
 
-	numCiclo += 1
+    numCiclo += 1
 
-	# Se calcula la precision en el conjunto de entrenamiento:
-	precisionEntrenamiento = mean(accuracy.(train_set))
-	println("Ciclo ", numCiclo, ": Precision en el conjunto de entrenamiento: ", 100 * precisionEntrenamiento, " %")
+    # Se calcula la precision en el conjunto de entrenamiento:
+    precisionEntrenamiento = mean(accuracy.(train_set))
+    println("Ciclo ", numCiclo, ": Precision en el conjunto de entrenamiento: ", 100 * precisionEntrenamiento, " %")
 
-	# Si se mejora la precision en el conjunto de entrenamiento, se calcula la de test y se guarda el modelo
-	if (precisionEntrenamiento > mejorPrecision)
-		mejorPrecision = precisionEntrenamiento
-		precisionTest = accuracy(test_set)
-		println("   Mejora en el conjunto de entrenamiento -> Precision en el conjunto de test: ", 100 * precisionTest, " %")
-		mejorModelo = deepcopy(ann)
-		numCicloUltimaMejora = numCiclo
-	end
+    # Si se mejora la precision en el conjunto de entrenamiento, se calcula la de test y se guarda el modelo
+    if (precisionEntrenamiento > mejorPrecision)
+        mejorPrecision = precisionEntrenamiento
+        precisionTest = accuracy(test_set)
+        println("   Mejora en el conjunto de entrenamiento -> Precision en el conjunto de test: ", 100 * precisionTest, " %")
+        mejorModelo = deepcopy(ann)
+        numCicloUltimaMejora = numCiclo
+    end
 
-	# Si no se ha mejorado en 5 ciclos, se baja la tasa de aprendizaje
-	if (numCiclo - numCicloUltimaMejora >= 5) && (eta > 1.0e-5)
-		global eta
-		eta /= 10.0
-		println("   No se ha mejorado la precision en el conjunto de entrenamiento en 5 ciclos, se baja la tasa de aprendizaje a ", eta)
-		adjust!(opt_state, eta)
-		numCicloUltimaMejora = numCiclo
-	end
+    # Si no se ha mejorado en 5 ciclos, se baja la tasa de aprendizaje
+    if (numCiclo - numCicloUltimaMejora >= 5) && (eta > 1.0e-5)
+        global eta
+        eta /= 10.0
+        println("   No se ha mejorado la precision en el conjunto de entrenamiento en 5 ciclos, se baja la tasa de aprendizaje a ", eta)
+        adjust!(opt_state, eta)
+        numCicloUltimaMejora = numCiclo
+    end
 
-	# Criterios de parada:
+    # Criterios de parada:
 
-	# Si la precision en entrenamiento es lo suficientemente buena, se para el entrenamiento
-	if (precisionEntrenamiento >= 0.999)
-		println("   Se para el entenamiento por haber llegado a una precision de 99.9%")
-		criterioFin = true
-	end
+    # Si la precision en entrenamiento es lo suficientemente buena, se para el entrenamiento
+    if (precisionEntrenamiento >= 0.999)
+        println("   Se para el entenamiento por haber llegado a una precision de 99.9%")
+        criterioFin = true
+    end
 
-	# Si no se mejora la precision en el conjunto de entrenamiento durante 10 ciclos, se para el entrenamiento
-	if (numCiclo - numCicloUltimaMejora >= 10)
-		println("   Se para el entrenamiento por no haber mejorado la precision en el conjunto de entrenamiento durante 10 ciclos")
-		criterioFin = true
-	end
+    # Si no se mejora la precision en el conjunto de entrenamiento durante 10 ciclos, se para el entrenamiento
+    if (numCiclo - numCicloUltimaMejora >= 10)
+        println("   Se para el entrenamiento por no haber mejorado la precision en el conjunto de entrenamiento durante 10 ciclos")
+        criterioFin = true
+    end
 end
 
 (
-	acc,
-	errorRate,
-	sensibility,
-	specificity,
-	precision,
-	negativePredictiveValues,
-	f1,
-	matrix,
-) = confusionMatrix(onecold(ann(test_set[1]),[0;1;2]), vec(onecold(test_set[2], [0;1;2])))
+    acc,
+    errorRate,
+    sensibility,
+    specificity,
+    precision,
+    negativePredictiveValues,
+    f1,
+    matrix,
+) = confusionMatrix(onecold(ann(test_set[1]), [0; 1; 2]), vec(onecold(test_set[2], [0; 1; 2])))
 
 println("\nAccuracy: ", acc)
 println("Error rate: ", errorRate)

@@ -13,7 +13,7 @@ function leer_nombres_imagenes(carpeta::AbstractString)
     return nombres
 end
 
-carpeta = "dataset/train/Very_Low/" # Reemplaza "/ruta/a/la/carpeta" con la ruta de tu carpeta de imágenes
+carpeta = "dataset/train/Moderate/" # Reemplaza "/ruta/a/la/carpeta" con la ruta de tu carpeta de imágenes
 nombres_imagenes = leer_nombres_imagenes(carpeta)
 
 coordenadas = Tuple{Float64,Float64}[]
@@ -23,7 +23,7 @@ for nombre in nombres_imagenes
 end
 
 
-output_file = "./coordenadasVeryLow.txt"
+output_file = "./coordenadasModerate.txt"
 using DelimitedFiles
 
 coordenadas_str = string.(coordenadas)

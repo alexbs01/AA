@@ -8,15 +8,15 @@ include("../fonts/boletin02.jl")
 using .ANNUtils: oneHotEncoding
 
 function convertirArrayImagenesHWCN(imagenes)
-	numPatrones = length(imagenes)
-	nuevoArray = Array{Float32, 4}(undef, 320, 320, 3, numPatrones) # Importante que sea un array de Float32
-	for i in 1:numPatrones
-		@assert (size(imagenes[i]) == (320, 320, 3)) "Las imagenes no tienen tamaño 320x320"
-		nuevoArray[:, :, 1, i] .= imagenes[i][:, :, 1]
-		nuevoArray[:, :, 2, i] .= imagenes[i][:, :, 2]
-		nuevoArray[:, :, 3, i] .= imagenes[i][:, :, 3]
-	end
-	return nuevoArray
+    numPatrones = length(imagenes)
+    nuevoArray = Array{Float32,4}(undef, 320, 320, 3, numPatrones) # Importante que sea un array de Float32
+    for i in 1:numPatrones
+        @assert (size(imagenes[i]) == (320, 320, 3)) "Las imagenes no tienen tamaño 320x320"
+        nuevoArray[:, :, 1, i] .= imagenes[i][:, :, 1]
+        nuevoArray[:, :, 2, i] .= imagenes[i][:, :, 2]
+        nuevoArray[:, :, 3, i] .= imagenes[i][:, :, 3]
+    end
+    return nuevoArray
 end;
 
 file = "comvL.jld2"
@@ -26,11 +26,11 @@ tr = load(file, "tag")
 
 tra = Int32.(trunc(size(in, 1) * 0.9))
 
-train_imgs   = in[1:tra, :]
+train_imgs = in[1:tra, :]
 train_labels = tr[1:tra, :]
-test_imgs    = in[tra+1:end, :]
-test_labels  = tr[1:tra, :]
-labels       = [0.0; 0.5; 1.0]
+test_imgs = in[tra+1:end, :]
+test_labels = tr[1:tra, :]
+labels = [0.0; 0.5; 1.0]
 
 
 in = nothing;
@@ -55,11 +55,11 @@ test_imgs = nothing;
 GC.gc()
 
 ann = Chain(
-	Conv((3, 3), 3 => 16, pad = (1, 1), relu),
-	MaxPool((2, 2)), Conv((3, 3), 16 => 32, pad = (1, 1), relu),
-	MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad = (1, 1), relu),
-	MaxPool((2, 2)), x -> reshape(x, :, size(x, 4)),
-	Dense(51200, 3), softmax,
+    Conv((3, 3), 3 => 16, pad=(1, 1), relu),
+    MaxPool((2, 2)), Conv((3, 3), 16 => 32, pad=(1, 1), relu),
+    MaxPool((2, 2)), Conv((3, 3), 32 => 32, pad=(1, 1), relu),
+    MaxPool((2, 2)), x -> reshape(x, :, size(x, 4)),
+    Dense(2048, 3), softmax,
 )
 
 numBatchCoger = 1;
@@ -69,13 +69,13 @@ entradaCapa = train_set[numBatchCoger][1][:, :, :, numImagenEnEseBatch];
 numCapas = length(Flux.params(ann));
 println("La RNA tiene ", numCapas, " capas:");
 for numCapa in 1:numCapas
-	println("   Capa ", numCapa, ": ", ann[numCapa])
-	# Le pasamos la entrada a esta capa
-	global entradaCapa # Esta linea es necesaria porque la variable entradaCapa es global y se modifica en este bucle
-	capa = ann[numCapa]
-	salidaCapa = capa(entradaCapa)
-	println("      La salida de esta capa tiene dimension ", size(salidaCapa))
-	entradaCapa = salidaCapa
+    println("   Capa ", numCapa, ": ", ann[numCapa])
+    # Le pasamos la entrada a esta capa
+    global entradaCapa # Esta linea es necesaria porque la variable entradaCapa es global y se modifica en este bucle
+    capa = ann[numCapa]
+    salidaCapa = capa(entradaCapa)
+    println("      La salida de esta capa tiene dimension ", size(salidaCapa))
+    entradaCapa = salidaCapa
 end
 
 ann(train_set[numBatchCoger][1][:, :, :, numImagenEnEseBatch]);
@@ -94,46 +94,46 @@ numCicloUltimaMejora = 0;
 mejorModelo = nothing;
 while !criterioFin
 
-	# Hay que declarar las variables globales que van a ser modificadas en el interior del bucle
-	global numCicloUltimaMejora, numCiclo, mejorPrecision, mejorModelo, criterioFin
-	# Se entrena un ciclo
-	Flux.train!(loss, ann, train_set, opt_state)
+    # Hay que declarar las variables globales que van a ser modificadas en el interior del bucle
+    global numCicloUltimaMejora, numCiclo, mejorPrecision, mejorModelo, criterioFin
+    # Se entrena un ciclo
+    Flux.train!(loss, ann, train_set, opt_state)
 
-	numCiclo += 1
+    numCiclo += 1
 
-	# Se calcula la precision en el conjunto de entrenamiento:
-	precisionEntrenamiento = mean(accuracy.(train_set))
-	println("Ciclo ", numCiclo, ": Precision en el conjunto de entrenamiento: ", 100 * precisionEntrenamiento, " %")
+    # Se calcula la precision en el conjunto de entrenamiento:
+    precisionEntrenamiento = mean(accuracy.(train_set))
+    println("Ciclo ", numCiclo, ": Precision en el conjunto de entrenamiento: ", 100 * precisionEntrenamiento, " %")
 
-	# Si se mejora la precision en el conjunto de entrenamiento, se calcula la de test y se guarda el modelo
-	if (precisionEntrenamiento >= mejorPrecision)
-		mejorPrecision = precisionEntrenamiento
-		precisionTest = accuracy(test_set)
-		println("   Mejora en el conjunto de entrenamiento -> Precision en el conjunto de test: ", 100 * precisionTest, " %")
-		mejorModelo = deepcopy(ann)
-		numCicloUltimaMejora = numCiclo
-	end
+    # Si se mejora la precision en el conjunto de entrenamiento, se calcula la de test y se guarda el modelo
+    if (precisionEntrenamiento >= mejorPrecision)
+        mejorPrecision = precisionEntrenamiento
+        precisionTest = accuracy(test_set)
+        println("   Mejora en el conjunto de entrenamiento -> Precision en el conjunto de test: ", 100 * precisionTest, " %")
+        mejorModelo = deepcopy(ann)
+        numCicloUltimaMejora = numCiclo
+    end
 
-	# Si no se ha mejorado en 5 ciclos, se baja la tasa de aprendizaje
-	if (numCiclo - numCicloUltimaMejora >= 5) && (opt.eta > 1e-6)
-		opt.eta /= 10.0
-		println("   No se ha mejorado en 5 ciclos, se baja la tasa de aprendizaje a ", opt.eta)
-		numCicloUltimaMejora = numCiclo
-	end
+    # Si no se ha mejorado en 5 ciclos, se baja la tasa de aprendizaje
+    if (numCiclo - numCicloUltimaMejora >= 5) && (opt.eta > 1e-6)
+        opt.eta /= 10.0
+        println("   No se ha mejorado en 5 ciclos, se baja la tasa de aprendizaje a ", opt.eta)
+        numCicloUltimaMejora = numCiclo
+    end
 
-	# Criterios de parada:
+    # Criterios de parada:
 
-	# Si la precision en entrenamiento es lo suficientemente buena, se para el entrenamiento
-	if (precisionEntrenamiento >= 0.999)
-		println("   Se para el entenamiento por haber llegado a una precision de 99.9%")
-		criterioFin = true
-	end
+    # Si la precision en entrenamiento es lo suficientemente buena, se para el entrenamiento
+    if (precisionEntrenamiento >= 0.999)
+        println("   Se para el entenamiento por haber llegado a una precision de 99.9%")
+        criterioFin = true
+    end
 
-	# Si no se mejora la precision en el conjunto de entrenamiento durante 10 ciclos, se para el entrenamiento
-	if (numCiclo - numCicloUltimaMejora >= 10)
-		println("   Se para el entrenamiento por no haber mejorado la precision en el conjunto de entrenamiento durante 10 ciclos")
-		criterioFin = true
-	end
+    # Si no se mejora la precision en el conjunto de entrenamiento durante 10 ciclos, se para el entrenamiento
+    if (numCiclo - numCicloUltimaMejora >= 10)
+        println("   Se para el entrenamiento por no haber mejorado la precision en el conjunto de entrenamiento durante 10 ciclos")
+        criterioFin = true
+    end
 end
 
 

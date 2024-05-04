@@ -37,7 +37,7 @@ end
 
 folder = "dataset/train"
 
-num = 100
+num = 1000
 println("Very_High")
 vh = loadFolderImages("$folder/Very_High/", num)
 vhT = Int32.(ones(size(vh, 1)))
@@ -72,4 +72,4 @@ GC.gc();
 
 v = v[shuffle(1:end), :]
 
-save("comvL.jld2", "im", v[:, 1], "tag", v[:, 2])
+save("comvM.jld2", "im", v[:, 1], "tag", v[:, 2])
