@@ -16,12 +16,10 @@ module DecissionTreeClassifier
     include("../fonts/boletin06.jl");
     include("../errorFunctions/errorFunctions.jl")
 
-    import .Metrics: confusionMatrix;
+    import .Metrics: show_metrics;
     import .CrossValidation: crossvalidation;
     import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
     import .ErrorFunctions: showErrorFunctions;
-
-    include("../metrics.jl")
 
     function execute(file::String)
 
@@ -33,27 +31,27 @@ module DecissionTreeClassifier
 
         # DecissionTreeClassifier
         for max_depth in [4, 6, 8, 12, 18, 24]
-        parameters = set_modelHyperparameters(max_depth=max_depth)
+            parameters = set_modelHyperparameters(max_depth=max_depth)
 
-        (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-            precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, 
-            mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation, true)
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, 
+                mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation, true)
 
-        println("\nMetrics for DecisionTreeClassifier")
-        println("Parameters:")
-        println("\tMax depth: ", max_depth)
+            println("\nMetrics for DecisionTreeClassifier")
+            println("Parameters:")
+            println("\tMax depth: ", max_depth)
 
-        println("mse: ", mse)
-        println("mse (std): ", mseD)
-        println("mae: ", mae)
-        println("mae (std): ", maeD)
-        println("msle: ", msle)
-        println("msle (std): ", msleD)
-        println("rmse: ", rmse)
-        println("rmse (std): ", rmseD)
+            println("mse: ", mse)
+            println("mse (std): ", mseD)
+            println("mae: ", mae)
+            println("mae (std): ", maeD)
+            println("msle: ", msle)
+            println("msle (std): ", msleD)
+            println("rmse: ", rmse)
+            println("rmse (std): ", rmseD)
 
-        _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
-            negativePredictiveValues, f1, matrix)
+            show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                negativePredictiveValues, f1, matrix)
 
         end
     end

@@ -16,13 +16,10 @@ module SVC
     include("../fonts/boletin06.jl");
     include("../errorFunctions/errorFunctions.jl")
 
-    import .Metrics: confusionMatrix;
+    import .Metrics: show_metrics;
     import .CrossValidation: crossvalidation;
     import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
     import .ErrorFunctions: showErrorFunctions;
-
-
-    include("../metrics.jl")
 
     function execute(file::String)
 
@@ -46,7 +43,7 @@ module SVC
                 (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                     precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
                     mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
-                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
+                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation, true)
 
 
                 println("\nMetrics for SVC with kernel: ", kernel)
@@ -54,7 +51,7 @@ module SVC
                 println("\tC: ", c)
 
                 showErrorFunctions(mse, mseD, mae, maeD, msle, msleD, rmse, rmseD)
-                _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
                     negativePredictiveValues, f1, matrix)
                 end
             elseif kernel == "poly"
@@ -69,7 +66,7 @@ module SVC
                 (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                     precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
                     mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
-                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
+                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation, true)
 
                 println("\nMetrics for SVC with kernel: ", kernel)
                 println("Parameters:")
@@ -78,7 +75,7 @@ module SVC
                 println("\tGamma: ", gamma)
                 println("\tCoef0: ", coef0)
                 showErrorFunctions(mse, mseD, mae, maeD, msle, msleD, rmse, rmseD)
-                _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
                     negativePredictiveValues, f1, matrix)
 
                 end
@@ -94,7 +91,7 @@ module SVC
                 (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                     precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
                     mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
-                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
+                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation, true)
 
 
                 println("\nMetrics for SVC with kernel: ", kernel)
@@ -102,7 +99,7 @@ module SVC
                 println("\tC: ", c)
                 println("\tGamma: ", gamma)
                 showErrorFunctions(mse, mseD, mae, maeD, msle, msleD, rmse, rmseD)
-                _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
                     negativePredictiveValues, f1, matrix)
 
                 end
@@ -118,7 +115,7 @@ module SVC
                 (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                     precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
                     mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
-                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation)
+                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation, true)
 
                 println("\nMetrics for SVC with kernel: ", kernel)
                 println("Parameters:")
@@ -126,7 +123,7 @@ module SVC
                 println("\tGamma: ", gamma)
                 println("\tCoef0: ", coef0)
                 showErrorFunctions(mse, mseD, mae, maeD, msle, msleD, rmse, rmseD)
-                _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
                     negativePredictiveValues, f1, matrix)
 
                 end

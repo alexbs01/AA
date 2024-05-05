@@ -14,10 +14,9 @@ module KNeighborsClassifier
     include("../fonts/boletin04.jl")
     include("../fonts/boletin05.jl")
     include("../fonts/boletin06.jl");
-    include("../metrics.jl")
     include("../errorFunctions/errorFunctions.jl")
 
-    import .Metrics: confusionMatrix;
+    import .Metrics: show_metrics;
     import .CrossValidation: crossvalidation;
     import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
     import .ErrorFunctions: showErrorFunctions;
@@ -34,28 +33,28 @@ module KNeighborsClassifier
 
         # KNeighborsClassifier
         for n_neighbors in [2, 4, 6, 8, 16, 24]
-        parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
-        
-        (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-            precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, 
-            mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = 
-            modelCrossValidation(:KNeighborsClassifier, parameters, in, tr, crossValidation, true)
+            parameters = set_modelHyperparameters(n_neighbors=n_neighbors)
+            
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, 
+                mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = 
+                modelCrossValidation(:KNeighborsClassifier, parameters, in, tr, crossValidation, true)
 
-        println("\nMetrics for KNeighborsClassifier")
-        println("Parameters:")
-        println("\tn_neighbors: ", n_neighbors)
+            println("\nMetrics for KNeighborsClassifier")
+            println("Parameters:")
+            println("\tn_neighbors: ", n_neighbors)
 
-        println("mse: ", mse)
-        println("mse (std): ", mseD)
-        println("mae: ", mae)
-        println("mae (std): ", maeD)
-        println("msle: ", msle)
-        println("msle (std): ", msleD)
-        println("rmse: ", rmse)
-        println("rmse (std): ", rmseD)
+            println("mse: ", mse)
+            println("mse (std): ", mseD)
+            println("mae: ", mae)
+            println("mae (std): ", maeD)
+            println("msle: ", msle)
+            println("msle (std): ", msleD)
+            println("rmse: ", rmse)
+            println("rmse (std): ", rmseD)
 
-        _show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
-            negativePredictiveValues, f1, matrix)
+            show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
+                negativePredictiveValues, f1, matrix)
         end
     end
 
