@@ -8,7 +8,7 @@ using Random
 include("../fonts/boletin04.jl")
 using .Metrics: confusionMatrix, printConfusionMatrix
 
-file = "comvM2.jld2"
+file = "comv.jld2"
 Random.seed!(88008)
 
 in = load(file, "im")
@@ -78,20 +78,6 @@ GC.gc(); # Pasar el recolector de basura
 funcionTransferenciaCapasConvolucionales = relu;
 
 # Definimos la red con la funcion Chain, que concatena distintas capas
-#=
-ann = Chain(
-	Conv((3, 3), 3 => 16, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)),
-	Conv((3, 3), 16 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)),
-	Conv((3, 3), 32 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
-	MaxPool((2, 2)),
-	x -> reshape(x, :, size(x, 4)),
-	Dense(2048, 5),
-	Dense(5, 3),
-	softmax
-)
-=#
 
 ann = Chain(
 	Conv((3, 3), 3 => 16, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
@@ -102,7 +88,6 @@ ann = Chain(
 	MaxPool((2, 2)),
 	x -> reshape(x, :, size(x, 4)),
 	Dense(2048, 3),
-	#Dense(5, 3),
 	softmax
 )
 
@@ -158,6 +143,7 @@ numCiclo = 0;
 numCicloUltimaMejora = 0;
 mejorModelo = nothing;
 
+printConfusionMatrix(onecold(ann(test_set[1]), [0; 1; 2]), vec(onecold(test_set[2], [0; 1; 2])))
 
 
 while !criterioFin
