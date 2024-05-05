@@ -110,7 +110,11 @@ module Metrics
 		err = (FN + FP) / (VN + VP + FN + FP)
 		sen = VP / (FN + VP)
 		esp = VN / (FP + VN)
-		vpp = VP / (VP + FP)
+		if (VP + FP) == 0
+			vpp = 0
+		else
+			vpp = VP / (VP + FP)
+		end
 		vpn = VN / (FP + VN)
 		f1 = 2 * ((sen * pre) / (sen + pre))
 
