@@ -27,4 +27,4 @@ dataset/
 *.jld2
 *.tar.gz
 
-!datasetForAprox/
+!datasetForAprox/*.jld2
