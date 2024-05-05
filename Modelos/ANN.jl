@@ -34,22 +34,36 @@ function execute(file::String, regresion::Bool=true)
     for topology in topologies
         parameters = set_modelHyperparameters(topology=topology)
 
-        (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
-            precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
-            mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
-            modelCrossValidation(:ANN, parameters, in, tr, crossValidation, regresion)
 
-        println("\nMetrics for ANN")
-        println("Parameters:")
-        println("\tTopology: ", topology)
-        println("mse: ", mse)
-        println("mse (std): ", mseD)
-        println("mae: ", mae)
-        println("mae (std): ", maeD)
-        println("msle: ", msle)
-        println("msle (std): ", msleD)
-        println("rmse: ", rmse)
-        println("rmse (std): ", rmseD)
+        if (regresion)
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
+                mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
+                modelCrossValidation(:ANN, parameters, in, tr, crossValidation, regresion)
+
+            println("\nMetrics for ANN")
+            println("Parameters:")
+            println("\tTopology: ", topology)
+            println("mse: ", mse)
+            println("mse (std): ", mseD)
+            println("mae: ", mae)
+            println("mae (std): ", maeD)
+            println("msle: ", msle)
+            println("msle (std): ", msleD)
+            println("rmse: ", rmse)
+            println("rmse (std): ", rmseD)
+
+        else
+            (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
+                precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix) =
+                modelCrossValidation(:ANN, parameters, in, tr, crossValidation, regresion)
+
+
+        end
+
+
+
+
 
         show_metrics(acc, errorRate, sensibility, stdSensibility, specificity, precision, stdPrecision,
             negativePredictiveValues, f1, matrix)

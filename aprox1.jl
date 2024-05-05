@@ -17,8 +17,17 @@ Random.seed!(88008)
 
 file = "datasetForAprox/VH-VL_aprox1.jld2"
 
-ANN.execute(file, false)
-DecissionTreeClassifier.execute(file, false)
+#ANN.execute(file, false)
+
+print("\n\n\n\n DecissionTreeClassifie \n\n\n\n")
+
+
+#DecissionTreeClassifier.execute(file, false)
+
+print("\n\n\n\n SVC \n\n\n\n")
 SVC.execute(file, false)
-KNeighborsClassifier.execute(file, false)
+
+print("\n\n\n\n KNeighborsClassifier \n\n\n\n")
+#KNeighborsClassifier.execute(file, false)
+
 
