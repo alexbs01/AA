@@ -21,7 +21,7 @@ module SVC
     import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
     import .ErrorFunctions: showErrorFunctions;
 
-    function execute(file::String)
+    function execute(file::String, regresion::Bool=true)
 
         in = load(file, "in")
         tr = load(file, "tr")
@@ -43,7 +43,7 @@ module SVC
                 (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                     precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix,
                     mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) =
-                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation, true)
+                    modelCrossValidation(:SVC, parameters, in, tr, crossValidation, regresion)
 
 
                 println("\nMetrics for SVC with kernel: ", kernel)

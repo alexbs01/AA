@@ -21,7 +21,7 @@ module DecissionTreeClassifier
     import .ScikitModels: modelCrossValidation, set_modelHyperparameters;
     import .ErrorFunctions: showErrorFunctions;
 
-    function execute(file::String)
+    function execute(file::String, regresion::Bool=true)
 
         in = load(file, "in")
         tr = load(file, "tr")
@@ -35,7 +35,7 @@ module DecissionTreeClassifier
 
             (acc, _, errorRate, _, sensibility, stdSensibility, specificity, _,
                 precision, stdPrecision, negativePredictiveValues, _, f1, _, matrix, 
-                mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation, true)
+                mse, mseD, mae, maeD, msle, msleD, rmse, rmseD) = modelCrossValidation(:DecissionTreeClassifier, parameters, in, tr, crossValidation, regresion)
 
             println("\nMetrics for DecisionTreeClassifier")
             println("Parameters:")

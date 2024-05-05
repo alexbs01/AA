@@ -17,7 +17,7 @@ Random.seed!(88008)
 
 file = "datasetForAprox/VH-M-VL3_aprox4.jld2"
 
-ANN.execute(file)
-DecissionTreeClassifier.execute(file)
+#ANN.execute(file)
+#DecissionTreeClassifier.execute(file)
 SVC.execute(file)
-KNeighborsClassifier.execute(file)
+#KNeighborsClassifier.execute(file)

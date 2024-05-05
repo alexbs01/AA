@@ -107,8 +107,8 @@ function imageLoader2(folder::String, type::Float64, numPerClass::Integer)
     imag = imageToColorArray(load(string(folder, fileName)))
 
     cord = split(fileName, "_")
-    
-    lat = cord[size(cord,1)]
+
+    lat = cord[size(cord, 1)]
     lat = parse(Float32, String.(lat[1:end-4]))
     alt = parse(Float32, String.(cord[size(cord, 1)-1]))
 
@@ -117,8 +117,8 @@ function imageLoader2(folder::String, type::Float64, numPerClass::Integer)
   return imagArr
 end
 
-imageToGrayArray(image:: Array{RGB{Normed{UInt8,8}},2}) = convert(Array{Float64,2}, gray.(Gray.(image)));
-imageToGrayArray(image::Array{RGBA{Normed{UInt8,8}},2}) = imageToGrayArray(RGB.(image));
+imageToGrayArray(image::Array{RGB{Normed{UInt8,8}},2}) = convert(Array{Float64,2}, gray.(Gray.(image)))
+imageToGrayArray(image::Array{RGBA{Normed{UInt8,8}},2}) = imageToGrayArray(RGB.(image))
 function meanGray(image::Array{Float64,2})
   [mean(image[:, 1]) mean(image[:, 2])]
 end
@@ -137,7 +137,7 @@ function imageLoader3(folder::String, type::Float64, numPerClass::Integer)
     imagG = imageToGrayArray(load(string(folder, fileName)))
 
     cord = split(fileName, "_")
-    lat = cord[size(cord,1)]
+    lat = cord[size(cord, 1)]
     lat = parse(Float32, String.(lat[1:end-4]))
     alt = parse(Float32, String.(cord[size(cord, 1)-1]))
 
@@ -216,3 +216,22 @@ function generateDataFile3(out::String, sources::Array{Tuple{String,Float64}}, n
 end
 
 end
+
+
+println(imageToColorArray(load("dataset/train/Very_High/27041631_5_-123.547051830273_41.5463004986268.png")));
+
+
+folder = "dataset/train/Moderate/"
+
+MeanimagArr = Array{Any}(undef, 0, 3)
+StdimagArr = Array{Any}(undef, 0, 3)
+
+for fileName in readdir(folder)
+  imag = imageToColorArray(load(string(folder, fileName)))
+  MeanimagArr = vcat(MeanimagArr, meanRGB(imag))
+  StdimagArr = vcat(StdimagArr, stdRGB(imag))
+
+end
+
+println(mean(MeanimagArr, dims=1))
+println(mean(StdimagArr, dims=1))
