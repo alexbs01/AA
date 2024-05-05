@@ -15,7 +15,7 @@ Random.seed!(88008)
 
 # Cargar datos y Extraer las características de esa aproximación 
 
-file = "datasetForAprox/VH-M-VL_aprox2.jld2"
+file = "datasetForAprox/VH-M-VL3_aprox4.jld2"
 
 ANN.execute(file)
 DecissionTreeClassifier.execute(file)
