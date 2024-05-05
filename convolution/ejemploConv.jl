@@ -80,14 +80,16 @@ funcionTransferenciaCapasConvolucionales = relu;
 # Definimos la red con la funcion Chain, que concatena distintas capas
 
 ann = Chain(
-	Conv((3, 3), 3 => 16, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
+	Conv((2, 2), 3 => 16, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
 	MaxPool((2, 2)),
-	Conv((3, 3), 16 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
+	Conv((2, 2), 16 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
 	MaxPool((2, 2)),
-	Conv((3, 3), 32 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
+	Conv((2, 2), 32 => 32, pad = (1, 1), funcionTransferenciaCapasConvolucionales),
 	MaxPool((2, 2)),
 	x -> reshape(x, :, size(x, 4)),
-	Dense(2048, 3),
+	Dense(2048, 5),	
+	Dense(5, 4),
+	Dense(4, 3),
 	softmax
 )
 
@@ -103,9 +105,12 @@ numImagenEnEseBatch = [12, 6];
 #   train_set[numBatchCoger][1] -> El primer elemento de esa tupla, es decir, las entradas de ese batch
 #   train_set[numBatchCoger][1][:,:,:,numImagenEnEseBatch] -> Los patrones seleccionados de las entradas de ese batch
 entradaCapa = train_set[numBatchCoger][1][:, :, :, numImagenEnEseBatch];
+
+#=
 numCapas = length(Flux.params(ann));
 println("La RNA tiene ", numCapas, " capas:");
 for numCapa in 1:numCapas
+	println(numCapa)
 	println("   Capa ", numCapa, ": ", ann[numCapa])
 	# Le pasamos la entrada a esta capa
 	global entradaCapa # Esta linea es necesaria porque la variable entradaCapa es global y se modifica en este bucle
@@ -114,6 +119,7 @@ for numCapa in 1:numCapas
 	println("      La salida de esta capa tiene dimension ", size(salidaCapa))
 	entradaCapa = salidaCapa
 end
+=#
 
 # Sin embargo, para aplicar un patron no hace falta hacer todo eso.
 #  Se puede aplicar patrones a la RNA simplemente haciendo, por ejemplo
@@ -142,8 +148,6 @@ criterioFin = false;
 numCiclo = 0;
 numCicloUltimaMejora = 0;
 mejorModelo = nothing;
-
-printConfusionMatrix(onecold(ann(test_set[1]), [0; 1; 2]), vec(onecold(test_set[2], [0; 1; 2])))
 
 
 while !criterioFin
